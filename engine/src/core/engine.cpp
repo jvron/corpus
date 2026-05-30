@@ -1,20 +1,34 @@
 #include "engine/engine.hpp"
+#include "engine/input.hpp"
+#include "engine/registry.hpp"
+#include "engine/scheduler.hpp"
 #include "platform/window/window.hpp"
 #include "renderer/renderer.hpp"
 
-void Engine::run() {
+void Engine::startUp(Registry &registry) {
 
-    Window window;
-    Renderer renderer;
+    Window::create(registry);
+    Input::init(registry);
 
-    window.create(620, 420, "test");
-    renderer.init();
+    //Scheduler scheduler;
+    scheduler.init(registry);
 
-    while (!window.shouldClose()) {
-        window.swapBuffers();
-        window.pollEvents();
+    scheduler.addSystem(Stage::Window, Window::pollEvents);
+    scheduler.addSystem(Stage::Window, Window::swapBuffers);
+    scheduler.addSystem(Stage::Update, Input::resetKeyStates);
+
+}
+
+void Engine::shutDown(Registry &registry) {
+
+    Window::destroy(registry);
+}
+
+void Engine::run(Registry &registry) {
+
+    while (!Window::shouldClose(registry)) {
+        scheduler.runStage(Stage::Window);
+        scheduler.runStage(Stage::Input);
+        scheduler.runStage(Stage::Update);
     }
-    
-
-    window.destroy();
 }
