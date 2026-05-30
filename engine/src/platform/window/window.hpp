@@ -1,17 +1,12 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
-class Window {
+#include "engine/registry.hpp"
 
-public:
-    void create(int width, int height, const char* title);
-    bool shouldClose();
-    void pollEvents();
-    void swapBuffers();
-    void* getHandle();
-    void destroy();
+namespace Window {
 
-private:
-    GLFWwindow* handle; // *GLFWwindow
-
+    void create(Registry &registry);
+    bool shouldClose(Registry &registry);
+    void pollEvents(Registry &registry);
+    void swapBuffers(Registry &registry);
+    void destroy(Registry &registry);
 };

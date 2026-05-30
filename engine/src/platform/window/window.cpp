@@ -3,8 +3,11 @@
 #include <iostream>
 
 #include "window.hpp"
+#include "engine/registry.hpp"
 
-void Window::create(int width, int height, const char* title) {
+void Window::create(Registry &registry) {
+
+    WindowConfig config = registry.windowConfig;
 
     if (!glfwInit()) {
 
@@ -16,7 +19,7 @@ void Window::create(int width, int height, const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    handle = glfwCreateWindow(width, height, title, NULL,  NULL);
+    GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title, nullptr,  nullptr);
     if (!handle) {
         glfwTerminate();
         std::cerr << "glfw window creation failed \n";
@@ -24,24 +27,22 @@ void Window::create(int width, int height, const char* title) {
     }
 
     glfwMakeContextCurrent(handle); // assign the window's openGL context to the TLS of the current thread
+
+    registry.windowState.handle = handle;
 }
 
-bool Window::shouldClose() {
-    return glfwWindowShouldClose(handle);
+bool Window::shouldClose(Registry &registry) {
+    return glfwWindowShouldClose(registry.windowState.handle);
 }
 
-void Window::pollEvents() {
+void Window::pollEvents(Registry &registry) {
     glfwPollEvents();
 }
-void Window::swapBuffers() {
-    glfwSwapBuffers(handle);
+void Window::swapBuffers(Registry &registry) {
+    glfwSwapBuffers(registry.windowState.handle);
 }
 
-void* Window::getHandle() {
-    return handle;
-}
-
-void Window::destroy() {
-    glfwDestroyWindow(handle);
+void Window::destroy(Registry &registry) {
+    glfwDestroyWindow(registry.windowState.handle);
     glfwTerminate();
 }
