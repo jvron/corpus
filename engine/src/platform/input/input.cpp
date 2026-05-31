@@ -4,31 +4,36 @@
 #include <cstring>
 
 void Input::init(Registry &registry) {
-    registryHandle = &registry; 
-    glfwSetKeyCallback((GLFWwindow*) registry.windowState.handle, keyCallBack);
+     
+    glfwSetKeyCallback(registry.windowState.handle, keyCallBack);
 }
 
 void Input::keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods ) {
 
+    Registry* registryHandle = static_cast<Registry*>(glfwGetWindowUserPointer(window)); // get registry pointer from window
+    
     if (!registryHandle) {
         return;
     } 
     switch (action) {
         case GLFW_PRESS:
             registryHandle->inputState.keyPressed[key] = true;
+            break;
         case GLFW_RELEASE:
             registryHandle->inputState.keyReleased[key] = true;
+            break;
     }
-
-}
-
-bool Input::keyIsPressed(Key key) {
-
-    return registryHandle->inputState.keyPressed[(int)key];
 }
 
 void Input::resetKeyStates(Registry &registry) {
+    
+    InputState &inputState = registry.inputState;
+    
+    memset(inputState.keyPressed, 0, sizeof(inputState.keyPressed));
+    memset(inputState.keyReleased, 0, sizeof(inputState.keyReleased));
+}
 
-    memset(registryHandle->inputState.keyPressed, 0, sizeof(registryHandle->inputState.keyPressed));
-    memset(registryHandle->inputState.keyReleased, 0, sizeof(registryHandle->inputState.keyPressed));
+bool Input::keyIsPressed(Registry &registry, Key key) {
+    
+    return registry.inputState.keyPressed[(int)key];
 }

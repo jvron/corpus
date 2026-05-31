@@ -3,7 +3,7 @@
 #include "engine/registry.hpp"
 #include <cstdint>
 
-struct GLFWwindow; // forward declaration
+struct GLFWwindow; 
 
 enum class Key : int32_t {
 
@@ -21,10 +21,11 @@ enum class Key : int32_t {
 
 
 namespace Input {
-
+    // engine systems
     void init(Registry &registry);
-    bool keyIsPressed(Key key);
     void resetKeyStates(Registry &registry);
     void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
-    inline Registry *registryHandle = nullptr;
-};
+
+    // game systems
+    bool keyIsPressed(Registry &registry, Key key);
+}
