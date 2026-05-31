@@ -1,19 +1,18 @@
 #pragma once
-#include <vector>
 
 #include "components.hpp"
 
 constexpr int32_t keyCount = 348; 
-
+struct GLFWwindow;
 
 struct WindowConfig { // user defined
     int width;
     int height;
-    const char* title;
+    const char* title = nullptr;
 };
 
 struct WindowState {
-    void* handle;
+    GLFWwindow* handle;
 };
 
 struct InputState {
@@ -22,17 +21,13 @@ struct InputState {
     bool keyPressed[keyCount] {};
     bool keyReleased[keyCount] {};
 
-    // overall key state
-    bool keyState[keyCount] {};
+   // persistent key state 
+    bool keyDown[keyCount] {};
 };
 
-class Registry {
+struct Registry {
 
-    public:
-    WindowConfig windowConfig;
-    WindowState windowState;
-    InputState inputState;
-
-    void addComponent(Component Component);
-    std::vector<Component> components; 
+    WindowConfig windowConfig {};
+    WindowState windowState {};
+    InputState inputState {};
 };

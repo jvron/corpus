@@ -18,9 +18,11 @@ void Input::keyCallBack(GLFWwindow* window, int key, int scancode, int action, i
     switch (action) {
         case GLFW_PRESS:
             registryHandle->inputState.keyPressed[key] = true;
+            registryHandle->inputState.keyDown[key] = true;
             break;
         case GLFW_RELEASE:
             registryHandle->inputState.keyReleased[key] = true;
+            registryHandle->inputState.keyDown[key] = false;
             break;
     }
 }
@@ -33,7 +35,19 @@ void Input::resetKeyStates(Registry &registry) {
     memset(inputState.keyReleased, 0, sizeof(inputState.keyReleased));
 }
 
-bool Input::keyIsPressed(Registry &registry, Key key) {
+bool Input::isKeyPressed(Registry &registry, Key key) {
     
     return registry.inputState.keyPressed[(int)key];
 }
+
+bool Input::isKeyReleased(Registry &registry, Key key) {
+
+    return registry.inputState.keyReleased[(int)key];
+}
+
+bool Input::isKeyDown(Registry &registry, Key key) {
+
+    return registry.inputState.keyDown[(int)key];
+}
+
+

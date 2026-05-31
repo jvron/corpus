@@ -27,5 +27,7 @@ namespace Input {
     void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // game systems
-    bool keyIsPressed(Registry &registry, Key key);
+    bool isKeyPressed(Registry &registry, Key key);
+    bool isKeyReleased(Registry &registry, Key key);
+    bool isKeyDown(Registry &registry, Key key);
 }
