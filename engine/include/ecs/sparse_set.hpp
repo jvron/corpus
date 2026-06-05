@@ -2,9 +2,10 @@
 
 #include <vector>
 
-#include "engine/components.hpp"
+#include "ecs/components.hpp"
 
 constexpr int maxEntities = 100;
+//constexpr size_t pageSize = 1024;
 
 template<typename Component>
 
@@ -17,5 +18,7 @@ class SparseSet {
 
     void insert(const Component &component, const Entity &entity);
     Component* lookup(const Entity &entity);
-    void detete(const Entity &entity);
+    void remove(const Entity &entity);
 };
+
+#include "sparse_set.tpp"
