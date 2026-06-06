@@ -45,4 +45,17 @@ public:
     SparseSet<Transform> transformPool;
     SparseSet<Mesh> meshPool;
     SparseSet<Renderable> renderablePool;
+
+    template<typename T> 
+    auto& getPool() {
+        if constexpr (std::is_same_v<T, Transform>) { // constexpr if statements run during compile time
+            return transformPool;
+        }
+        else if constexpr (std::is_same_v<T, Mesh>) {
+            return meshPool;
+        }
+        else if constexpr (std::is_same_v<T, Renderable>) {
+            return renderablePool;
+        }
+    }
 };
