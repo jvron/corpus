@@ -1,18 +1,20 @@
 #pragma once
 
-#include "components.hpp"
+#include "ecs/components.hpp"
+#include "ecs/sparse_set.hpp"
+
 
 constexpr int32_t keyCount = 348; 
 struct GLFWwindow;
 
 struct WindowConfig { // user defined
-    int width;
-    int height;
+    int width {};
+    int height {};
     const char* title = nullptr;
 };
 
 struct WindowState {
-    GLFWwindow* handle;
+    GLFWwindow* handle = nullptr;
 };
 
 struct InputState {
@@ -25,9 +27,22 @@ struct InputState {
     bool keyDown[keyCount] {};
 };
 
-struct Registry {
+struct RenderState {
+    Color clearColor;
+};
 
-    WindowConfig windowConfig {};
-    WindowState windowState {};
-    InputState inputState {};
+struct Resources {
+
+    WindowConfig windowConfig;
+    WindowState windowState;
+    InputState inputState;
+    RenderState renderState;
+};
+
+class Registry {
+public:
+
+    SparseSet<Transform> transformPool;
+    SparseSet<Mesh> meshPool;
+    SparseSet<Renderable> renderablePool;
 };
