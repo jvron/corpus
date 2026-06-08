@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <vector>
 
 #include "ecs/components.hpp"
@@ -7,18 +8,27 @@
 constexpr int maxEntities = 100;
 //constexpr size_t pageSize = 1024;
 
-template<typename Component>
+class DynamicSparseSet {
 
-class SparseSet {
+private:
 
-    public:
-    int sparseArray[maxEntities] {};
-    std::vector<Component> denseArray {};
-    std::vector<Entity> entityArray {};
+public:
+    size_t componentSize; //stride
+    int sparse[maxEntities] {};
+    std::vector<Entity> denseEntities {};
+    std::vector<std::byte> denseComponents {};
+    
+    DynamicSparseSet() : componentSize(0) {} // default constructor 
+    DynamicSparseSet(size_t size) : componentSize(size) {}
 
-    void insert(const Component &component, const Entity &entity);
-    Component* lookup(const Entity &entity);
+    const size_t size() const;
+
+    bool hasEntity(const Entity &entity) const; //checks if the sparse set contains an entity
+    
+    void write(const Entity &entity, const void* componentSourceBytes);
     void remove(const Entity &entity);
-};
 
-#include "sparse_set.tpp"
+    // return pointer to component source bytes 
+    void* getRaw(const Entity &entity);
+
+};
