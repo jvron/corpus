@@ -2,6 +2,10 @@
 
 #include "ecs/components.hpp"
 #include "ecs/sparse_set.hpp"
+#include <cassert>
+#include <cstdint>
+#include <sys/types.h>
+#include <vector>
 
 
 constexpr int32_t keyCount = 348; 
@@ -40,22 +44,52 @@ struct Resources {
 };
 
 class Registry {
+
+private:
+    static inline int typeCounter = 0;
+
 public:
 
-    SparseSet<Transform> transformPool;
-    SparseSet<Mesh> meshPool;
-    SparseSet<Renderable> renderablePool;
+    std::vector<DynamicSparseSet> pools;
+
+    template<typename T>
+    static uint32_t getId() { //unique type id for each component type, a new function is created for each component type
+        static uint32_t typeId = typeCounter++; //typeCounter is only incremented once (first function call)
+        return typeId;
+    }
+
+    template <typename T>
+    DynamicSparseSet* getPool() {
+        uint32_t componentId = getId<T>();
+
+        if (componentId >= pools.size() || pools[componentId].componentSize == 0) {
+            return nullptr;
+        }
+        
+        return &pools[componentId];
+    } 
 
     template<typename T> 
-    auto& getPool() {
-        if constexpr (std::is_same_v<T, Transform>) { // constexpr if statements run during compile time
-            return transformPool;
+    void registerComponent() {
+
+        if (getPool<T>() != nullptr) {
+            return;
         }
-        else if constexpr (std::is_same_v<T, Mesh>) {
-            return meshPool;
+
+        DynamicSparseSet pool = DynamicSparseSet(sizeof(T));
+        uint32_t componentId = getId<T>(); 
+
+        if (componentId >= pools.size()) {
+            pools.resize(componentId + 1);
         }
-        else if constexpr (std::is_same_v<T, Renderable>) {
-            return renderablePool;
-        }
+        pools[componentId] = pool;
     }
+
+    template <typename T>
+    T& getComponent(const Entity &entity) { //assumes that the entity exists (to be used by view and not by the game)
+
+        DynamicSparseSet* pool = getPool<T>();
+        assert(pool == nullptr && "Error: requested pool does not exist");
+        return *static_cast<T*>(pool->getRaw(entity));
+    } 
 };
