@@ -53,8 +53,17 @@ public:
     T& getComponent(const Entity &entity) { //assumes that the entity exists (to be used by view and not by the game)
 
         SparseSet* pool = getPool<T>();
-        assert(pool == nullptr && "Error: requested pool does not exist");
+        assert(pool != nullptr && "Error: requested pool does not exist");
 
         return *static_cast<T*>(pool->getRaw(entity));
-    } 
+    }
+
+    template <typename T>
+    void insert(const Entity &entity, const T &component) {
+
+        assert(getPool<T>() != nullptr && "Error: component type must be registered via registerComponent<T>() before insertion");
+        uint32_t componentId = getId<T>();
+
+        pools[componentId].write(entity, &component);
+    }
 };
