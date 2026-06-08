@@ -7,50 +7,13 @@
 #include <sys/types.h>
 #include <vector>
 
-
-constexpr int32_t keyCount = 348; 
-struct GLFWwindow;
-
-struct WindowConfig { // user defined
-    int width {};
-    int height {};
-    const char* title = nullptr;
-};
-
-struct WindowState {
-    GLFWwindow* handle = nullptr;
-};
-
-struct InputState {
-    
-    // per frame key state (reset per frame)
-    bool keyPressed[keyCount] {};
-    bool keyReleased[keyCount] {};
-
-   // persistent key state 
-    bool keyDown[keyCount] {};
-};
-
-struct RenderState {
-    Color clearColor;
-};
-
-struct Resources {
-
-    WindowConfig windowConfig;
-    WindowState windowState;
-    InputState inputState;
-    RenderState renderState;
-};
-
 class Registry {
 
 private:
     static inline int typeCounter = 0;
+    std::vector<SparseSet> pools;
 
 public:
-
-    std::vector<DynamicSparseSet> pools;
 
     template<typename T>
     static uint32_t getId() { //unique type id for each component type, a new function is created for each component type
@@ -59,7 +22,8 @@ public:
     }
 
     template <typename T>
-    DynamicSparseSet* getPool() {
+    SparseSet* getPool() {
+        
         uint32_t componentId = getId<T>();
 
         if (componentId >= pools.size() || pools[componentId].componentSize == 0) {
@@ -76,7 +40,7 @@ public:
             return;
         }
 
-        DynamicSparseSet pool = DynamicSparseSet(sizeof(T));
+        SparseSet pool = SparseSet(sizeof(T));
         uint32_t componentId = getId<T>(); 
 
         if (componentId >= pools.size()) {
@@ -88,8 +52,9 @@ public:
     template <typename T>
     T& getComponent(const Entity &entity) { //assumes that the entity exists (to be used by view and not by the game)
 
-        DynamicSparseSet* pool = getPool<T>();
+        SparseSet* pool = getPool<T>();
         assert(pool == nullptr && "Error: requested pool does not exist");
+
         return *static_cast<T*>(pool->getRaw(entity));
     } 
 };

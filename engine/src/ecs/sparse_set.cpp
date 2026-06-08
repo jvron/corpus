@@ -3,11 +3,11 @@
 #include <cstddef>
 #include <cstring>
 
-const size_t DynamicSparseSet::size() const {
+const size_t SparseSet::size() const {
     return denseEntities.size();
 }
 
-bool DynamicSparseSet::hasEntity(const Entity &entity) const {
+bool SparseSet::hasEntity(const Entity &entity) const {
     int denseIndex = sparse[entity.id];
 
         if (denseIndex >= denseEntities.size() || denseIndex < 0) {
@@ -22,7 +22,7 @@ bool DynamicSparseSet::hasEntity(const Entity &entity) const {
         }
     }
 
-void DynamicSparseSet::write(const Entity &entity, const void* componentSourceBytes) {
+void SparseSet::write(const Entity &entity, const void* componentSourceBytes) {
     if (hasEntity(entity)) {
         return;
     }
@@ -39,7 +39,7 @@ void DynamicSparseSet::write(const Entity &entity, const void* componentSourceBy
     std::memcpy(destination, componentSourceBytes, componentSize);
 }
 
-void DynamicSparseSet::remove(const Entity &entity) {
+void SparseSet::remove(const Entity &entity) {
 
     if (!hasEntity(entity)) {
         return;
@@ -71,7 +71,7 @@ void DynamicSparseSet::remove(const Entity &entity) {
     denseComponents.resize(denseComponents.size() - componentSize);
 }
 
-void* DynamicSparseSet::getRaw(const Entity &entity) {
+void* SparseSet::getRaw(const Entity &entity) {
     
     if (!hasEntity(entity)) {
         return nullptr;

@@ -8,7 +8,7 @@
 constexpr int maxEntities = 100;
 //constexpr size_t pageSize = 1024;
 
-class DynamicSparseSet {
+class SparseSet {
 
 private:
 
@@ -18,8 +18,8 @@ public:
     std::vector<Entity> denseEntities {};
     std::vector<std::byte> denseComponents {};
     
-    DynamicSparseSet() : componentSize(0) {} // default constructor 
-    DynamicSparseSet(size_t size) : componentSize(size) {}
+    SparseSet() : componentSize(0) {} // default constructor 
+    SparseSet(size_t size) : componentSize(size) {}
 
     const size_t size() const;
 
