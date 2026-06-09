@@ -1,34 +1,38 @@
 #include "engine/engine.hpp"
 #include "engine/input.hpp"
-#include "engine/registry.hpp"
+#include "engine/world.hpp"
 #include "engine/scheduler.hpp"
 #include "platform/window/window.hpp"
-#include "renderer/renderer.hpp"
 
-void Engine::startUp(Registry &registry) {
+void Engine::startUp(World &world) {
 
-    Window::create(registry);
-    Input::init(registry);
+    Window::create(world);
+    Input::init(world);
 
-    //Scheduler scheduler;
-    scheduler.init(registry);
+    scheduler.init(world);
+    //Renderer::init(world);
 
-    scheduler.addSystem(Stage::Window, Window::pollEvents);
-    scheduler.addSystem(Stage::Window, Window::swapBuffers);
+    scheduler.addSystem(Stage::Begin, Window::pollEvents);
     scheduler.addSystem(Stage::Update, Input::resetKeyStates);
+    //scheduler.addSystem(Stage::Render, Renderer::beginFrame);
+    //scheduler.addSystem(Stage::Render, Renderer::renderScene);
+    //scheduler.addSystem(Stage::Render, Renderer::endFrame);
+    scheduler.addSystem(Stage::End, Window::swapBuffers);
 
 }
 
-void Engine::shutDown(Registry &registry) {
+void Engine::shutDown(World &world) {
 
-    Window::destroy(registry);
+    Window::destroy(world);
 }
 
-void Engine::run(Registry &registry) {
+void Engine::run(World &world) {
 
-    while (!Window::shouldClose(registry)) {
-        scheduler.runStage(Stage::Window);
+    while (!Window::shouldClose(world)) {
+        scheduler.runStage(Stage::Begin);
         scheduler.runStage(Stage::Input);
         scheduler.runStage(Stage::Update);
+        //scheduler.runStage(Stage::Render);
+        scheduler.runStage(Stage::End);
     }
 }

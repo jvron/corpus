@@ -3,11 +3,10 @@
 #include <iostream>
 
 #include "window.hpp"
-#include "engine/registry.hpp"
 
-void Window::create(Registry &registry) {
+void Window::create(World &world) {
 
-    WindowConfig config = registry.windowConfig;
+    const WindowConfig &config = world.resources.windowConfig;
 
     if (!glfwInit()) {
 
@@ -28,21 +27,23 @@ void Window::create(Registry &registry) {
 
     glfwMakeContextCurrent(handle); // assign the window's openGL context to the TLS of the current thread
 
-    registry.windowState.handle = handle;
+    glfwSetWindowUserPointer(handle, &world); // store world pointer in the window
+
+    world.resources.windowState.handle = handle;
 }
 
-bool Window::shouldClose(Registry &registry) {
-    return glfwWindowShouldClose(registry.windowState.handle);
+bool Window::shouldClose(World &world) {
+    return glfwWindowShouldClose(world.resources.windowState.handle);
 }
 
-void Window::pollEvents(Registry &registry) {
+void Window::pollEvents(World &world) {
     glfwPollEvents();
 }
-void Window::swapBuffers(Registry &registry) {
-    glfwSwapBuffers(registry.windowState.handle);
+void Window::swapBuffers(World &world) {
+    glfwSwapBuffers(world.resources.windowState.handle);
 }
 
-void Window::destroy(Registry &registry) {
-    glfwDestroyWindow(registry.windowState.handle);
+void Window::destroy(World &world) {
+    glfwDestroyWindow(world.resources.windowState.handle);
     glfwTerminate();
 }

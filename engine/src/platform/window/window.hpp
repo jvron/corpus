@@ -1,12 +1,12 @@
 #pragma once
 
-#include "engine/registry.hpp"
+#include "engine/world.hpp"
 
 namespace Window {
 
-    void create(Registry &registry);
-    bool shouldClose(Registry &registry);
-    void pollEvents(Registry &registry);
-    void swapBuffers(Registry &registry);
-    void destroy(Registry &registry);
+    void create(World &world);
+    bool shouldClose(World &world);
+    void pollEvents(World &world);
+    void swapBuffers(World &world);
+    void destroy(World &world);
 };

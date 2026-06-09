@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ecs/registry.hpp"
 
 
@@ -38,6 +40,6 @@ struct Resources {
 
 struct World {
 
-    Resources Resources;
+    Resources resources;
     Registry registry;
 };

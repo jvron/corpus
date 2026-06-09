@@ -29,5 +29,5 @@ target_include_directories(glad PUBLIC
 # ------------------------
 target_link_libraries(engine
     PUBLIC glfw
-    PRIVATE glad
+    PUBLIC glad
 )

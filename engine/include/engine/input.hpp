@@ -1,7 +1,8 @@
 #pragma once
 
-#include "engine/registry.hpp"
 #include <cstdint>
+
+#include "engine/world.hpp"
 
 struct GLFWwindow; 
 
@@ -22,12 +23,12 @@ enum class Key : int32_t {
 
 namespace Input {
     // engine systems
-    void init(Registry &registry);
-    void resetKeyStates(Registry &registry);
+    void init(World &world);
+    void resetKeyStates(World &world);
     void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // game systems
-    bool isKeyPressed(Registry &registry, Key key);
-    bool isKeyReleased(Registry &registry, Key key);
-    bool isKeyDown(Registry &registry, Key key);
+    bool isKeyPressed(World &world, Key key);
+    bool isKeyReleased(World &world, Key key);
+    bool isKeyDown(World &world, Key key);
 }

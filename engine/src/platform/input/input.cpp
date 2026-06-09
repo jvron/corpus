@@ -1,53 +1,54 @@
-#include "engine/input.hpp"
-#include "GLFW/glfw3.h"
-#include "engine/registry.hpp"
 #include <cstring>
+#include <GLFW/glfw3.h>
 
-void Input::init(Registry &registry) {
+#include "engine/world.hpp"
+#include "engine/input.hpp"
+
+void Input::init(World &world) {
      
-    glfwSetKeyCallback(registry.windowState.handle, keyCallBack);
+    glfwSetKeyCallback(world.resources.windowState.handle, keyCallBack);
 }
 
 void Input::keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods ) {
 
-    Registry* registryHandle = static_cast<Registry*>(glfwGetWindowUserPointer(window)); // get registry pointer from window
+    World* worldHandle = static_cast<World*>(glfwGetWindowUserPointer(window)); // get registry pointer from window
     
-    if (!registryHandle) {
+    if (!worldHandle) {
         return;
     } 
     switch (action) {
         case GLFW_PRESS:
-            registryHandle->inputState.keyPressed[key] = true;
-            registryHandle->inputState.keyDown[key] = true;
+            worldHandle->resources.inputState.keyPressed[key] = true;
+            worldHandle->resources.inputState.keyDown[key] = true;
             break;
         case GLFW_RELEASE:
-            registryHandle->inputState.keyReleased[key] = true;
-            registryHandle->inputState.keyDown[key] = false;
+            worldHandle->resources.inputState.keyReleased[key] = true;
+            worldHandle->resources.inputState.keyDown[key] = false;
             break;
     }
 }
 
-void Input::resetKeyStates(Registry &registry) {
+void Input::resetKeyStates(World &world) {
     
-    InputState &inputState = registry.inputState;
+    InputState &inputState = world.resources.inputState;
     
     memset(inputState.keyPressed, 0, sizeof(inputState.keyPressed));
     memset(inputState.keyReleased, 0, sizeof(inputState.keyReleased));
 }
 
-bool Input::isKeyPressed(Registry &registry, Key key) {
+bool Input::isKeyPressed(World &world, Key key) {
     
-    return registry.inputState.keyPressed[(int)key];
+    return world.resources.inputState.keyPressed[(int)key];
 }
 
-bool Input::isKeyReleased(Registry &registry, Key key) {
+bool Input::isKeyReleased(World &world, Key key) {
 
-    return registry.inputState.keyReleased[(int)key];
+    return world.resources.inputState.keyReleased[(int)key];
 }
 
-bool Input::isKeyDown(Registry &registry, Key key) {
+bool Input::isKeyDown(World &world, Key key) {
 
-    return registry.inputState.keyDown[(int)key];
+    return world.resources.inputState.keyDown[(int)key];
 }
 
 

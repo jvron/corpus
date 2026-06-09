@@ -1,17 +1,17 @@
 #include <vector>
-#include "engine/registry.hpp"
+
 #include "engine/scheduler.hpp"
+#include "engine/world.hpp"
 
 
-void Scheduler::init(Registry &registry) {
-    registryHandle = &registry;
+void Scheduler::init(World &world) {
+    worldHandle = &world;
 
 }
 void Scheduler::runStage(Stage stage) {
-
     
     for (auto sys : pipeline.at(stage).systems) {
-        sys(*registryHandle);
+        sys(*worldHandle);
     }
 }
 
