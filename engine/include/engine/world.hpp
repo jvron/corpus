@@ -1,5 +1,6 @@
 #pragma once
 
+#include "assets/asset_manager.hpp"
 #include "ecs/registry.hpp"
 
 
@@ -42,4 +43,5 @@ struct World {
 
     Resources resources;
     Registry registry;
+    AssetManager assetManager;
 };
