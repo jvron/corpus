@@ -27,3 +27,33 @@ void GLBackend::setAttribute(GLuint vao, size_t offset) {
     glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offset);
     glVertexArrayAttribBinding(vao, 0, 0);
 }
+
+GLuint GLBackend::compileVertShader(const char *shaderSource) {
+    GLuint vertexShader {};
+    glShaderSource(vertexShader, 1, &shaderSource, NULL);
+    glCompileShader(vertexShader);
+    return vertexShader;
+}
+
+GLuint GLBackend::compileFragShader(const char *shaderSource) {
+    GLuint fragmentShader {};
+    glShaderSource(fragmentShader, 1, &shaderSource, NULL);
+    glCompileShader(fragmentShader);
+    return fragmentShader;
+}
+
+GLuint GLBackend::createShaderProgram() {
+    return glCreateProgram();
+}
+
+void GLBackend::attachShader(GLuint &shaderProgram, GLuint &shader) {
+    glAttachShader(shaderProgram, shader);
+}
+
+void GLBackend::deleteShader(GLuint &shader) {
+    glDeleteShader(shader);
+}
+
+void GLBackend::linkProgram(GLuint &shaderProgram) {
+    glLinkProgram(shaderProgram);
+}

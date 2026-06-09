@@ -15,4 +15,11 @@ namespace GLBackend {
     void createVertexArray(GLuint &vao);
     void AttachVertexBuffer(GLuint vao, GLuint buffer, size_t stride);
     void setAttribute(GLuint vao, size_t offset);
+
+    GLuint compileVertShader(const char* shaderSource);
+    GLuint compileFragShader(const char* shaderSource);
+    GLuint createShaderProgram();
+    void attachShader(GLuint &shaderProgram, GLuint &shader);
+    void deleteShader(GLuint &shader); 
+    void linkProgram(GLuint &shaderProgram);
 }
