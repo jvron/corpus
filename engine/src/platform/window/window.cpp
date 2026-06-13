@@ -6,7 +6,7 @@
 
 void Window::create(World &world) {
 
-    const WindowConfig &config = world.resources.windowConfig;
+    const WindowConfig &config = world.engineConfig.windowConfig;
 
     if (!glfwInit()) {
 
@@ -29,21 +29,21 @@ void Window::create(World &world) {
 
     glfwSetWindowUserPointer(handle, &world); // store world pointer in the window
 
-    world.resources.windowState.handle = handle;
+    world.engineState.windowState.handle = handle;
 }
 
 bool Window::shouldClose(World &world) {
-    return glfwWindowShouldClose(world.resources.windowState.handle);
+    return glfwWindowShouldClose(world.engineState.windowState.handle);
 }
 
 void Window::pollEvents(World &world) {
     glfwPollEvents();
 }
 void Window::swapBuffers(World &world) {
-    glfwSwapBuffers(world.resources.windowState.handle);
+    glfwSwapBuffers(world.engineState.windowState.handle);
 }
 
 void Window::destroy(World &world) {
-    glfwDestroyWindow(world.resources.windowState.handle);
+    glfwDestroyWindow(world.engineState.windowState.handle);
     glfwTerminate();
 }

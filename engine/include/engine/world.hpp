@@ -1,11 +1,12 @@
 #pragma once
 
-#include "assets/asset_manager.hpp"
+#include "resources/resource_manager.hpp"
 #include "ecs/registry.hpp"
 
 
 constexpr int32_t keyCount = 348; 
 struct GLFWwindow;
+typedef unsigned int GLuint;
 
 struct WindowConfig { // user defined
     int width {};
@@ -31,17 +32,23 @@ struct RenderState {
     Color clearColor;
 };
 
-struct Resources {
+struct EngineState {
 
-    WindowConfig windowConfig;
     WindowState windowState;
     InputState inputState;
     RenderState renderState;
 };
 
+struct EngineConfig {
+    WindowConfig windowConfig;
+};
+
+
 struct World {
 
-    Resources resources;
+    EngineConfig engineConfig;
+    EngineState engineState;
+
     Registry registry;
-    AssetManager assetManager;
+    ResourceManager resourceManager;
 };
