@@ -1,4 +1,6 @@
 #pragma once
+#include <GL/gl.h>
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,16 +20,33 @@ struct Vertex {
     Position position;
 };
 
+struct VertexAttribute {
+    uint32_t location {};
+    uint32_t componentCount {};
+    GLenum componentType {};
+    GLboolean normalized {};
+    size_t relativeOffset {};
+};
+
+struct VertexLayout {
+    uint32_t bindingIndex {};
+    size_t stride {};
+    std::vector<VertexAttribute> attributes;
+};
 
 struct MeshAsset {
     std::vector<Vertex> vertices {};
     std::vector<uint32_t> indices {};
+
+    VertexLayout vertexLayout;
 };
 
 struct GPUMesh {
     GLuint vao {};
     GLuint vbo {};
     GLuint ebo {};
+
+    uint32_t indexCount {};
 };
 
 class ResourceManager {
