@@ -2,7 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "window.hpp"
+#include "engine/window.hpp"
+#include "engine/world.hpp"
 
 void Window::create(World &world) {
 
@@ -36,7 +37,7 @@ bool Window::shouldClose(World &world) {
     return glfwWindowShouldClose(world.engineState.windowState.handle);
 }
 
-void Window::pollEvents(World &world) {
+void Window::pollEvents(World&) {
     glfwPollEvents();
 }
 void Window::swapBuffers(World &world) {
@@ -47,3 +48,7 @@ void Window::destroy(World &world) {
     glfwDestroyWindow(world.engineState.windowState.handle);
     glfwTerminate();
 }
+
+void Window::close(World &world) {
+    glfwSetWindowShouldClose(world.engineState.windowState.handle, true);
+} 
