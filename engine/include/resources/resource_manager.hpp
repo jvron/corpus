@@ -2,13 +2,13 @@
 #include <GL/gl.h>
 #include <cstddef>
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include <cstdint>
 
 #include "ecs/components.hpp"
 
-using MeshHandle = uint32_t;
+using ShaderProgram = uint32_t;
+
 typedef unsigned int GLuint ;
 
 enum class ShaderType {
@@ -52,16 +52,15 @@ struct GPUMesh {
 class ResourceManager {
 
 private:
-    std::unordered_map<std::string, uint32_t> shaderPrograms;
+    std::vector<ShaderProgram> shaderPrograms;
     std::vector<MeshAsset> meshAssets;
-    
     std::string readFile(const std::string &filePath);
     
 public:
     std::vector<GPUMesh> gpuMeshes;
 
-    void createShaderProgram(const std::string &programName, std::vector<std::string> &shaderPaths);
-    uint32_t getShaderProgram(const std::string &programName);
+    ShaderHandle createShaderProgram(std::vector<std::string> &shaderPaths);
+    ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
 
     Mesh insertMeshAsset(const MeshAsset &meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);

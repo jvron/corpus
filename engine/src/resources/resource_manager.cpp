@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "resources/resource_manager.hpp"
+#include "ecs/components.hpp"
 #include "renderer/opengl/gl_backend.hpp"
 
 std::string ResourceManager::readFile(const std::string &filePath) {
@@ -27,59 +28,59 @@ std::string ResourceManager::readFile(const std::string &filePath) {
     return stream.str();
 }
 
-void ResourceManager::createShaderProgram(const std::string &programName, std::vector<std::string> &filePaths) {
+ShaderHandle ResourceManager::createShaderProgram(std::vector<std::string> &filePaths) {
 
-    uint32_t shaderProgram = GLBackend::createShaderProgram();
+    ShaderProgram program = GLBackend::createShaderProgram();
     
     for (const auto &path : filePaths) {
 
         std::string shaderSource = readFile(path);
 
         if (shaderSource.empty()) {
-            std::cerr << "Error: Skipping shader program " << programName << " due to missing file: " << path << "\n";
+            std::cerr << "Error: Skipping shader program " << " due to missing file: " << path << "\n";
             continue;;
         }
-        const char* c_shaderSouce = shaderSource.c_str();
+        const char* c_shaderSource = shaderSource.c_str();
 
         std::filesystem::path filePath = path;
 
         uint32_t shader {};
 
         if (filePath.extension() == ".vert") {
-            shader = GLBackend::compileVertShader(c_shaderSouce);
+            shader = GLBackend::compileVertShader(c_shaderSource);
         }
         else if (filePath.extension() == ".frag") {
-            shader = GLBackend::compileFragShader(c_shaderSouce);
+            shader = GLBackend::compileFragShader(c_shaderSource);
         }
         else {
             std::cerr << "Error: Unkown shader type " << path << "\n";
             continue;
         }
 
-        GLBackend::attachShader(shaderProgram, shader);
+        GLBackend::attachShader(program, shader);
         GLBackend::deleteShader(shader);
     }
 
-    GLBackend::linkProgram(shaderProgram);
+    GLBackend::linkProgram(program);
 
-    shaderPrograms.insert({programName, shaderProgram});
+    ShaderHandle handle = shaderPrograms.size();
+    shaderPrograms.push_back(program);
+    return handle;
 }
 
-uint32_t ResourceManager::getShaderProgram(const std::string &programName) {
+ShaderProgram ResourceManager::getShaderProgram(ShaderHandle shaderHandle) {
 
-    if (shaderPrograms.find(programName) == shaderPrograms.end()) {
-        std::cerr << "Error: Shader program called " << programName << " does not exist"<<"\n";
-    }
+    assert(!(shaderHandle >= meshAssets.size())&& "Error: Shader program does not exist");
 
-    return shaderPrograms.at(programName);
+    return shaderPrograms[shaderHandle];
 }
 
 Mesh ResourceManager::insertMeshAsset(const MeshAsset &meshAsset) {
 
-    uint32_t index = meshAssets.size();
+    MeshHandle handle = meshAssets.size();
     meshAssets.push_back(meshAsset);
 
-    Mesh mesh = {index};
+    Mesh mesh = {.meshHandle = handle};
     return mesh;
 }
 
