@@ -4,6 +4,7 @@
 
 #include "gl_backend.hpp"
 #include "engine/world.hpp"
+#include "resources/resource_manager.hpp"
 
 void GLBackend::clearBuffer(Color &clearColor) {
     glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -71,4 +72,21 @@ void GLBackend::deleteShader(GLuint &shader) {
 
 void GLBackend::linkProgram(GLuint &shaderProgram) {
     glLinkProgram(shaderProgram);
+}
+
+void GLBackend::drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram) {
+
+    glUseProgram(shaderProgram);
+    glBindVertexArray(gpuMesh.vao);
+    glDrawElements(GL_TRIANGLES, gpuMesh.indexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+void GLBackend::destroyMesh(GPUMesh &gpuMesh) {
+    glDeleteBuffers(1, &gpuMesh.vbo);
+    glDeleteBuffers(1, &gpuMesh.ebo);
+    glDeleteVertexArrays(1, &gpuMesh.vao);
+}
+
+void GLBackend::deleteShaderProgram(ShaderProgram program) {
+    glDeleteProgram(program);
 }

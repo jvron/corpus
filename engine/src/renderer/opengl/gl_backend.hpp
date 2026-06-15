@@ -26,4 +26,9 @@ namespace GLBackend {
     void attachShader(GLuint &shaderProgram, GLuint &shader);
     void deleteShader(GLuint &shader);
     void linkProgram(GLuint &shaderProgram);
+
+    void drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram);
+
+    void destroyMesh(GPUMesh &gpuMesh);
+    void deleteShaderProgram(ShaderProgram program);
 }
