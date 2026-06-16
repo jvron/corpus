@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <glad/glad.h>
 #include <cstddef>
+#include <iostream>
 
 #include "gl_backend.hpp"
 #include "engine/world.hpp"
@@ -43,11 +44,34 @@ void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttri
 }
 
 //shaders
+
+void GLBackend::checkCompileStatus(GLuint shader, GLenum shaderType) {
+    int success {};
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+    if (!success) {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+
+        if (shaderType == GL_VERTEX_SHADER) {
+            std::cerr << "[ERROR]: Vertex shader compilation failed. \n";
+            std::cerr << "InfoLog: " << infoLog << "\n";
+        }
+        else if (shaderType == GL_FRAGMENT_SHADER) {
+            std::cerr << "[ERROR]: Fragment shader compilation failed. \n";
+            std::cerr << "InfoLog: " << infoLog << "\n";
+        }
+    }
+}
+
 GLuint GLBackend::compileVertShader(const char *shaderSource) {
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &shaderSource, NULL);
     glCompileShader(vertexShader);
+
+    checkCompileStatus(vertexShader,  GL_VERTEX_SHADER);
+
     return vertexShader;
 }
 
@@ -55,6 +79,9 @@ GLuint GLBackend::compileFragShader(const char *shaderSource) {
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &shaderSource, NULL);
     glCompileShader(fragmentShader);
+
+    checkCompileStatus(fragmentShader, GL_FRAGMENT_SHADER);
+
     return fragmentShader;
 }
 

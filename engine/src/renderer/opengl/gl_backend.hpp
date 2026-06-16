@@ -1,5 +1,6 @@
 #pragma once
 //#include <glad/glad.h>
+#include <GL/gl.h>
 #include <cstddef>
 
 #include "ecs/components.hpp"
@@ -22,6 +23,8 @@ namespace GLBackend {
 
     GLuint compileVertShader(const char* shaderSource);
     GLuint compileFragShader(const char* shaderSource);
+    void checkCompileStatus(GLuint shader, GLenum shaderType);
+
     GLuint createShaderProgram();
     void attachShader(GLuint &shaderProgram, GLuint &shader);
     void deleteShader(GLuint &shader);
