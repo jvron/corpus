@@ -15,7 +15,7 @@
 void Renderer::init(World &world) {
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Error: glad load failed \n";
+        std::cerr << "[ERROR]: glad load failed \n";
         return;
     }
 
@@ -27,13 +27,9 @@ void Renderer::init(World &world) {
 
 void Renderer::uploadMesh(World &world) {
 
-    View view = View<Mesh>(world.registry);
-    const std::vector<Entity> &validEntities = view.getEntities();
-
-    for (const Entity &entity : validEntities) {
-        Mesh &mesh = world.registry.getComponent<Mesh>(entity);
+    for (const auto& [entity, mesh] : View<Mesh>(world.registry)) {
        
-        std::cout << "Debug: UploadMesh found " << validEntities.size() << " entities\n";
+        //std::cout << "[DEBUG]: UploadMesh found Entity with ID = " << entity.id << "\n";
         MeshAsset &meshAsset = world.resourceManager.getMeshAsset(mesh.meshHandle);
 
         GPUMesh gpuMesh;
@@ -42,8 +38,8 @@ void Renderer::uploadMesh(World &world) {
         GLBackend::createBuffer(gpuMesh.ebo);
         gpuMesh.indexCount = meshAsset.indices.size();
 
-        std::cout << "Debug: Uploading mesh indices size: " << meshAsset.indices.size() << "\n";
-        std::cout << "Debug: Uploading mesh vertices size: " << meshAsset.vertices.size() << "\n";
+        //std::cout << "[DEBUG]: Uploading mesh indices size: " << meshAsset.indices.size() << "\n";
+        //std::cout << "[DEBUG]: Uploading mesh vertices size: " << meshAsset.vertices.size() << "\n";
 
         GLBackend::uploadBuffer(gpuMesh.vbo, meshAsset.vertices.size() * sizeof(Vertex), meshAsset.vertices.data());
         GLBackend::uploadBuffer(gpuMesh.ebo, meshAsset.indices.size() * sizeof(uint32_t), meshAsset.indices.data());
@@ -66,20 +62,14 @@ void Renderer::beginFrame(World &world) {
 
 void Renderer::renderScene(World &world) {
 
-    View view = View<Mesh, Material, Renderable>(world.registry);
-    const std::vector<Entity> &validEntities = view.getEntities();
-
-    for (const Entity &entity : validEntities) {
-        Material &material = world.registry.getComponent<Material>(entity);
+    for (const auto& [entity, mesh, material, renderable] : View<Mesh, Material, Renderable>(world.registry)) {
+        //std::cerr << "[DEBUG]: Drawing Entity ID = " << entity.id << "\n";
         
         ShaderProgram shaderProgram = world.resourceManager.getShaderProgram(material.shaderHandle);
-
-        Renderable &renderableObj = world.registry.getComponent<Renderable>(entity);
-
-        if (!renderableObj.visible) {
+        
+        if (!renderable.visible) {
             continue;
         }
-        Mesh &mesh = world.registry.getComponent<Mesh>(entity);
 
         GPUMesh &gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
         GLBackend::drawIndexed(gpuMesh, shaderProgram);
