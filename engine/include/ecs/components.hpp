@@ -4,9 +4,11 @@
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
+using EntityID = uint32_t;
 
 struct Entity {
-    int32_t id {};
+    EntityID id {};
+    uint32_t generation {};
 };
 
 struct Color {

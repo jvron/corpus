@@ -1,11 +1,12 @@
 #pragma once
 
-#include "ecs/components.hpp"
-#include "ecs/sparse_set.hpp"
 #include <cassert>
 #include <cstdint>
 #include <sys/types.h>
 #include <vector>
+
+#include "ecs/components.hpp"
+#include "ecs/sparse_set.hpp"
 
 class Registry {
 
@@ -13,7 +14,15 @@ private:
     static inline int typeCounter = 0;
     std::vector<SparseSet> pools;
 
+    //index = EntityID
+    std::vector<uint32_t> generations;
+    std::vector<EntityID> freeEntityIDs; 
+
 public:
+
+    Entity createEntity();
+    bool isValidEntity(Entity entity);
+    void destroyEntity(Entity entity);
 
     template<typename T>
     static uint32_t getId() { //unique type id for each component type, a new function is created for each component type
@@ -29,7 +38,6 @@ public:
         if (componentId >= pools.size() || pools[componentId].componentSize == 0) {
             return nullptr;
         }
-        
         return &pools[componentId];
     } 
 
@@ -39,7 +47,6 @@ public:
         if (getPool<T>() != nullptr) {
             return;
         }
-
         SparseSet pool = SparseSet(sizeof(T));
         uint32_t componentId = getId<T>(); 
 
@@ -50,7 +57,7 @@ public:
     }
 
     template <typename T>
-    T& getComponent(const Entity &entity) { //assumes that the entity exists (to be used by view and not by the game)
+    T& getComponent(Entity entity) { //assumes that the entity exists (to be used by view and not by the game)
 
         SparseSet* pool = getPool<T>();
         assert(pool != nullptr && "Error: requested pool does not exist");
@@ -59,7 +66,7 @@ public:
     }
 
     template <typename T>
-    void insert(const Entity &entity, const T &component) {
+    void insert(Entity entity, const T& component) {
 
         assert(getPool<T>() != nullptr && "Error: component type must be registered via registerComponent<T>() before insertion");
         uint32_t componentId = getId<T>();
