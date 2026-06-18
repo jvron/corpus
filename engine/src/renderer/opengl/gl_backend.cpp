@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <cstddef>
 #include <iostream>
 
@@ -8,7 +9,7 @@
 #include "resources/resource_manager.hpp"
 
 void GLBackend::clearBuffer(Color &clearColor) {
-    glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+    glClearColor(clearColor.value.r, clearColor.value.g, clearColor.value.b, clearColor.value.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -36,7 +37,6 @@ void GLBackend::attachElementBuffer(GLuint vao, GLuint buffer) {
 void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttribute &attribute) { 
 
     glEnableVertexArrayAttrib(vao, attribute.location); // enable attribute layout location slot at specified location 
-
     // set vertex attribute layout at the location
     glVertexArrayAttribFormat(vao, attribute.location, attribute.componentCount, attribute.componentType, attribute.normalized, attribute.relativeOffset); 
     // read from VBO at binding index n
@@ -65,7 +65,6 @@ void GLBackend::checkCompileStatus(GLuint shader, GLenum shaderType) {
 }
 
 GLuint GLBackend::compileVertShader(const char *shaderSource) {
-
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &shaderSource, NULL);
     glCompileShader(vertexShader);
@@ -101,8 +100,19 @@ void GLBackend::linkProgram(GLuint &shaderProgram) {
     glLinkProgram(shaderProgram);
 }
 
-void GLBackend::drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram) {
+void GLBackend::useProgram(GLuint shaderProgram) {
+    glUseProgram(shaderProgram);
+}
 
+GLuint GLBackend::getUniformLocation(ShaderProgram shaderProgram, const std::string &uniformName) {
+    return glGetUniformLocation(shaderProgram, uniformName.c_str());
+}
+
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value) {
+    glProgramUniform4fv(shaderProgram, location, 1, glm::value_ptr(value));
+}
+
+void GLBackend::drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram) {
     glUseProgram(shaderProgram);
     glBindVertexArray(gpuMesh.vao);
     glDrawElements(GL_TRIANGLES, gpuMesh.indexCount, GL_UNSIGNED_INT, nullptr);

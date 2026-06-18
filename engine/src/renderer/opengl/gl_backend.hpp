@@ -1,6 +1,7 @@
 #pragma once
 //#include <glad/glad.h>
 #include <GL/gl.h>
+#include <glm/glm.hpp>
 #include <cstddef>
 
 #include "ecs/components.hpp"
@@ -29,6 +30,10 @@ namespace GLBackend {
     void attachShader(GLuint &shaderProgram, GLuint &shader);
     void deleteShader(GLuint &shader);
     void linkProgram(GLuint &shaderProgram);
+    void useProgram(GLuint shaderProgram);
+
+    GLuint getUniformLocation(ShaderProgram shaderProgram, const std::string& uniformName);
+    void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
 
     void drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram);
 
