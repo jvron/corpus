@@ -28,7 +28,7 @@ std::string ResourceManager::readFile(const std::string &filePath) {
     return stream.str();
 }
 
-ShaderHandle ResourceManager::createShaderProgram(std::vector<std::string> &filePaths) {
+ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
     ShaderProgram program = GLBackend::createShaderProgram();
     
@@ -37,7 +37,7 @@ ShaderHandle ResourceManager::createShaderProgram(std::vector<std::string> &file
         std::string shaderSource = readFile(path);
 
         if (shaderSource.empty()) {
-            std::cerr << "Error: Skipping shader program " << " due to missing file: " << path << "\n";
+            std::cerr << "[ERROR]: Skipping shader program " << " due to missing file: " << path << "\n";
             continue;;
         }
         const char* c_shaderSource = shaderSource.c_str();
@@ -53,7 +53,7 @@ ShaderHandle ResourceManager::createShaderProgram(std::vector<std::string> &file
             shader = GLBackend::compileFragShader(c_shaderSource);
         }
         else {
-            std::cerr << "Error: Unkown shader type " << path << "\n";
+            std::cerr << "[ERROR]: Unkown shader type " << path << "\n";
             continue;
         }
 
@@ -65,14 +65,39 @@ ShaderHandle ResourceManager::createShaderProgram(std::vector<std::string> &file
 
     ShaderHandle handle = shaderPrograms.size();
     shaderPrograms.push_back(program);
+
+    ShaderAsset shaderAsset;
+    shaderAsset.shaderProgram = program;
+    shaderAssets.push_back(shaderAsset);
+
     return handle;
 }
 
 ShaderProgram ResourceManager::getShaderProgram(ShaderHandle shaderHandle) {
 
-    assert(!(shaderHandle >= meshAssets.size())&& "Error: Shader program does not exist");
+    assert(!(shaderHandle >= shaderPrograms.size()) && "[ERROR]: Shader program does not exist");
 
     return shaderPrograms[shaderHandle];
+}
+
+
+
+ShaderAsset& ResourceManager::getShaderAsset(ShaderHandle shaderHandle) {
+    assert(!(shaderHandle >= shaderPrograms.size()) && "[ERROR]: Shader program does not exist");
+    return shaderAssets[shaderHandle];
+}
+
+
+
+void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName) {
+
+    ShaderAsset& shaderAsset =  getShaderAsset(shaderHandle);
+
+    if (shaderAsset.uniformLocations.find(uniformName) == shaderAsset.uniformLocations.end()) {
+        GLuint location = GLBackend::getUniformLocation(shaderAsset.shaderProgram, uniformName);
+        //std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
+        shaderAsset.uniformLocations[uniformName] = location;
+    }
 }
 
 Mesh ResourceManager::insertMeshAsset(const MeshAsset &meshAsset) {

@@ -1,7 +1,9 @@
 #pragma once
+
 #include <GL/gl.h>
 #include <cstddef>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <cstdint>
 
@@ -9,15 +11,14 @@
 
 using ShaderProgram = uint32_t;
 
-typedef unsigned int GLuint ;
-
 enum class ShaderType {
     Vertex,
     Fragment,
 };
 
 struct Vertex {
-    Position position;
+    glm::vec3 position {};
+    glm::vec4 color {};
 };
 
 struct VertexAttribute {
@@ -49,18 +50,29 @@ struct GPUMesh {
     uint32_t indexCount {};
 };
 
+struct ShaderAsset {
+    ShaderProgram shaderProgram {};
+    std::unordered_map<std::string, GLint> uniformLocations; 
+};
+
 class ResourceManager {
 
 private:
     std::vector<ShaderProgram> shaderPrograms;
+    std::vector<ShaderAsset> shaderAssets;
     std::vector<MeshAsset> meshAssets;
-    std::string readFile(const std::string &filePath);
-    
-public:
+
     std::vector<GPUMesh> gpuMeshes;
 
-    ShaderHandle createShaderProgram(std::vector<std::string> &shaderPaths);
+    std::string readFile(const std::string& filePath);
+    
+public:
+
+    ShaderHandle createShaderProgram(const std::vector<std::string> &shaderPaths);
     ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
+
+    ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
+    void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);
 
     Mesh insertMeshAsset(const MeshAsset &meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
