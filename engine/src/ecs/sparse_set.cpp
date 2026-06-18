@@ -1,31 +1,36 @@
 #include "ecs/sparse_set.hpp"
 #include "ecs/components.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <iostream>
 
-const size_t SparseSet::size() const {
+size_t SparseSet::size() const {
     return denseEntities.size();
 }
 
-bool SparseSet::hasEntity(const Entity &entity) const {
-    int denseIndex = sparse[entity.id];
-
-        if (denseIndex >= denseEntities.size() || denseIndex < 0) {
-            return false;
-        }
-
-        if (denseEntities[denseIndex].id == entity.id) {
-            return true;
-        }
-        else {
-            return false;
-        }
+bool SparseSet::hasEntity(Entity entity) const {
+    //std::cerr << "[DEBUG]: Checking Entity ID: " << entity.id << "\n";
+    uint32_t denseIndex = sparse[entity.id];
+   
+    if (denseIndex >= denseEntities.size() || denseIndex < 0) {
+        return false;
     }
 
-void SparseSet::write(const Entity &entity, const void* componentSourceBytes) {
+    if (denseEntities[denseIndex].id == entity.id) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void SparseSet::write(Entity entity, const void* componentSourceBytes) {
+
     if (hasEntity(entity)) {
         return;
-    }
+    };
+
     //will be inserted at the end of the dense arrays
     int denseIndex = denseEntities.size();
     denseEntities.push_back(entity);
@@ -39,12 +44,12 @@ void SparseSet::write(const Entity &entity, const void* componentSourceBytes) {
     std::memcpy(destination, componentSourceBytes, componentSize);
 }
 
-void SparseSet::remove(const Entity &entity) {
+void SparseSet::remove(Entity entity) {
 
     if (!hasEntity(entity)) {
         return;
     }
-    int denseIndex = sparse[entity.id];
+    uint32_t denseIndex = sparse[entity.id];
 
     size_t denseSize = denseEntities.size();
     int lastDenseIndex = denseSize - 1;
@@ -56,11 +61,9 @@ void SparseSet::remove(const Entity &entity) {
         Entity movedEntity = denseEntities[denseIndex];
         sparse[movedEntity.id] = denseIndex;
 
-
         std::byte* moveDestination = denseComponents.data() + (denseIndex * componentSize);
-        //size of denseEntities index tells us how many components are stored 
         std::byte* lastComponent = denseComponents.data() + (lastDenseIndex * componentSize);  
-    
+        
         std::memcpy(moveDestination, lastComponent, componentSize);
     }
     denseEntities.pop_back();
@@ -71,7 +74,7 @@ void SparseSet::remove(const Entity &entity) {
     denseComponents.resize(denseComponents.size() - componentSize);
 }
 
-void* SparseSet::getRaw(const Entity &entity) {
+void* SparseSet::getRaw(Entity entity) {
     
     if (!hasEntity(entity)) {
         return nullptr;

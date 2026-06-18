@@ -21,14 +21,14 @@ public:
     SparseSet() : componentSize(0) {} // default constructor 
     SparseSet(size_t size) : componentSize(size) {}
 
-    const size_t size() const;
+    size_t size() const;
 
-    bool hasEntity(const Entity &entity) const; //checks if the sparse set contains an entity
+    bool hasEntity(Entity entity) const; //checks if the sparse set contains an entity
     
-    void write(const Entity &entity, const void* componentSourceBytes);
-    void remove(const Entity &entity);
+    void write(Entity entity, const void* componentSourceBytes);
+    void remove(Entity entity);
 
     // return pointer to component source bytes 
-    void* getRaw(const Entity &entity);
+    void* getRaw(Entity entity);
 
 };
