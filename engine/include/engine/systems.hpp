@@ -17,3 +17,9 @@ namespace CameraControlSystem {
     void moveRight(Camera& camera, CameraController& ctrl, float dt);
     void moveLeft(Camera& camera, CameraController& ctrl, float dt);
 }
+
+namespace CameraSystem {
+
+    void updateView(Camera& camera, glm::mat4& view);
+    void updateProjection(World& world, Camera& camera, glm::mat4& projection);
+}
