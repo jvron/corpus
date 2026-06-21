@@ -25,8 +25,20 @@ struct InputState {
     // per frame key state (reset per frame)
     bool keyPressed[keyCount] {};
     bool keyReleased[keyCount] {};
-   // persistent key state 
+    // persistent key state 
     bool keyDown[keyCount] {};
+
+    bool firstMouse {true};
+    float lastMouseX {};
+    float lastMouseY {};
+    float mouseDeltaX {};
+    float mouseDeltaY {};
+
+    bool cursorEnabled {false};
+};
+
+struct InputConfig {
+    float sensitivity {};
 };
 
 struct RenderState {
@@ -39,7 +51,7 @@ struct Time {
     double previousTime {};
     double elapsedTime {};
 
-    uint32_t frameCount {};
+    uint32_t frameCount {}; // total number of frames since startup
 };
 
 struct EngineState {
@@ -51,6 +63,7 @@ struct EngineState {
 
 struct EngineConfig {
     WindowConfig windowConfig;
+    InputConfig inputConfig;
 };
 
 struct World {
@@ -60,4 +73,6 @@ struct World {
 
     Registry registry;
     ResourceManager resourceManager;
+
+    Entity activeCamera;
 };
