@@ -1,10 +1,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <cstdio>
 #include <cstdint>
 #include <iostream>
-#include <vector>
+#include <glm/ext/matrix_transform.hpp>
 
+#include "engine/systems.hpp"
 #include "resources/resource_manager.hpp"
 #include "ecs/components.hpp"
 #include "engine/world.hpp"
@@ -22,7 +22,7 @@ void Renderer::init(World &world) {
     glViewport(0, 0, world.engineConfig.windowConfig.width, world.engineConfig.windowConfig.height);
 
     glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);  
 }
 
 void Renderer::uploadMesh(World &world) {
@@ -62,16 +62,40 @@ void Renderer::beginFrame(World &world) {
 
 void Renderer::renderScene(World &world) {
 
-    for (const auto& [entity, mesh, material, renderable] : View<Mesh, Material, Renderable>(world.registry)) {
+    Camera& camera = world.registry.getComponent<Camera>(world.activeCamera);
+
+    glm::mat4 view = glm::mat4(1.0f);
+    CameraSystem::updateView(camera, view);
+    
+    glm::mat4 projection = glm::mat4(1.0f);
+    CameraSystem::updateProjection(world, camera, projection);
+
+    for (const auto& [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
+
+        glm::mat4 model = glm::mat4(1.0f);
+
         //std::cerr << "[DEBUG]: Drawing Entity ID = " << entity.id << "\n";
-        
-        ShaderProgram shaderProgram = world.resourceManager.getShaderProgram(material.shaderHandle);
-        
         if (!renderable.visible) {
             continue;
         }
 
-        GPUMesh &gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
-        GLBackend::drawIndexed(gpuMesh, shaderProgram);
+        //ShaderProgram shaderProgram = world.resourceManager.getShaderProgram(material.shaderHandle);
+        ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(material.shaderHandle);
+
+        model = glm::translate(model, transform.position);
+        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(model, transform.scale);
+        //Model = T * R * S
+        
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], model);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uView"], view);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uProjection"], projection);
+
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
+
+        GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
+        GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
     }
 }
