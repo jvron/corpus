@@ -1,15 +1,19 @@
 #include <GLFW/glfw3.h>
 #include <cstring>
 
-#include "engine/input.hpp"
+#include "platform/input.hpp"
 #include "engine/world.hpp"
 
-void Input::init(World &world) {
-     
-    glfwSetKeyCallback(world.engineState.windowState.handle, keyCallBack);
+void Input::init(World& world) {
+    
+    world.engineState.inputState.lastMouseX = (float) world.engineConfig.windowConfig.width / 2.0f;
+    world.engineState.inputState.lastMouseY = (float) world.engineConfig.windowConfig.height / 2.0f; 
+
+    glfwSetKeyCallback(world.engineState.windowState.handle, keyCallback);
+    glfwSetCursorPosCallback(world.engineState.windowState.handle, cursorCallback);
 }
 
-void Input::keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods ) {
+void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods ) {
 
     World* worldHandle = static_cast<World*>(glfwGetWindowUserPointer(window)); // get registry pointer from window
     
@@ -30,7 +34,30 @@ void Input::keyCallBack(GLFWwindow* window, int key, int scancode, int action, i
     }
 }
 
-void Input::resetKeyStates(World &world) {
+void Input::cursorCallback(GLFWwindow* window, double xPos, double yPos) {
+
+    World* worldHandle = static_cast<World*>(glfwGetWindowUserPointer(window));
+    if (!worldHandle) {
+        return;
+    }
+
+    World& world = *worldHandle;
+    InputState& inputState = world.engineState.inputState;
+    
+    if (inputState.firstMouse) {
+        inputState.lastMouseX = xPos;
+        inputState.lastMouseY = yPos;
+        inputState.firstMouse = false;
+    }
+
+    inputState.mouseDeltaX = xPos - inputState.lastMouseX;
+    inputState.mouseDeltaY = inputState.lastMouseY - yPos;
+
+    inputState.lastMouseX = xPos;
+    inputState.lastMouseY = yPos;
+}
+
+void Input::resetKeyStates(World& world) {
     
     InputState &inputState = world.engineState.inputState;
     
@@ -38,26 +65,26 @@ void Input::resetKeyStates(World &world) {
     memset(inputState.keyReleased, 0, sizeof(inputState.keyReleased));
 }
 
-bool Input::isKeyPressed(World &world, Key key) {
+bool Input::isKeyPressed(World& world, Key key) {
     
     return world.engineState.inputState.keyPressed[(int)key];
 }
 
-bool Input::isKeyReleased(World &world, Key key) {
+bool Input::isKeyReleased(World& world, Key key) {
 
     return world.engineState.inputState.keyReleased[(int)key];
 }
 
-bool Input::isKeyDown(World &world, Key key) {
+bool Input::isKeyDown(World& world, Key key) {
 
     return world.engineState.inputState.keyDown[(int)key];
 }
 
-void Input::enableCursor(World &world) {
+void Input::enableCursor(World& world) {
     glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void Input::disableCursor(World &world) {
+void Input::disableCursor(World& world) {
     glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 

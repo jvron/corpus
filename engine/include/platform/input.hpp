@@ -27,7 +27,8 @@ namespace Input {
     void init(World& world);
     void resetKeyStates(World& world);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
+    void cursorCallback(GLFWwindow* window, double xPos, double yPos);
+    
     // game systems
     bool isKeyPressed(World& world, Key key);
     bool isKeyReleased(World& world, Key key);
