@@ -2,13 +2,14 @@
 
 #include <cstdint>
 
-#include "engine/world.hpp"
+//#include "engine/world.hpp"
 
+struct World;
 struct GLFWwindow; 
 
 enum class Key : int32_t {
 
-    SPACE = 32, 
+    SPACE         = 32, 
     A             = 65,
     D             = 68,
     S             = 83,
@@ -31,4 +32,7 @@ namespace Input {
     bool isKeyPressed(World &world, Key key);
     bool isKeyReleased(World &world, Key key);
     bool isKeyDown(World &world, Key key);
+
+    void enableCursor(World& world);
+    void disableCursor(World &world);
 }

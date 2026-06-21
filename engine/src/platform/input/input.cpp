@@ -53,4 +53,11 @@ bool Input::isKeyDown(World &world, Key key) {
     return world.engineState.inputState.keyDown[(int)key];
 }
 
+void Input::enableCursor(World &world) {
+    glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Input::disableCursor(World &world) {
+    glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 
