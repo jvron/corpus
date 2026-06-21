@@ -8,12 +8,12 @@
 #include "engine/world.hpp"
 #include "resources/resource_manager.hpp"
 
-void GLBackend::clearBuffer(Color &clearColor) {
+void GLBackend::clearBuffer(Color& clearColor) {
     glClearColor(clearColor.value.r, clearColor.value.g, clearColor.value.b, clearColor.value.a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GLBackend::createBuffer(GLuint &buffer) {
+void GLBackend::createBuffer(GLuint& buffer) {
     glCreateBuffers(1, &buffer);
 }
 
@@ -22,7 +22,7 @@ void GLBackend::uploadBuffer(GLuint buffer, size_t size , const void* data) {
 }
 
 // vertex array
-void GLBackend::createVertexArray(GLuint &vao) {
+void GLBackend::createVertexArray(GLuint& vao) {
     glCreateVertexArrays(1, &vao);
 }
 
@@ -43,7 +43,7 @@ void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttri
     glVertexArrayAttribBinding(vao, attribute.location, bindingIndex); 
 }
 
-//shaders
+//shader
 
 void GLBackend::checkCompileStatus(GLuint shader, GLenum shaderType) {
     int success {};
@@ -64,7 +64,7 @@ void GLBackend::checkCompileStatus(GLuint shader, GLenum shaderType) {
     }
 }
 
-GLuint GLBackend::compileVertShader(const char *shaderSource) {
+GLuint GLBackend::compileVertShader(const char* shaderSource) {
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &shaderSource, NULL);
     glCompileShader(vertexShader);
@@ -74,7 +74,7 @@ GLuint GLBackend::compileVertShader(const char *shaderSource) {
     return vertexShader;
 }
 
-GLuint GLBackend::compileFragShader(const char *shaderSource) {
+GLuint GLBackend::compileFragShader(const char* shaderSource) {
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &shaderSource, NULL);
     glCompileShader(fragmentShader);
@@ -88,21 +88,23 @@ GLuint GLBackend::createShaderProgram() {
     return glCreateProgram();
 }
 
-void GLBackend::attachShader(GLuint &shaderProgram, GLuint &shader) {
+void GLBackend::attachShader(GLuint& shaderProgram, GLuint& shader) {
     glAttachShader(shaderProgram, shader);
 }
 
-void GLBackend::deleteShader(GLuint &shader) {
+void GLBackend::deleteShader(GLuint& shader) {
     glDeleteShader(shader);
 }
 
-void GLBackend::linkProgram(GLuint &shaderProgram) {
+void GLBackend::linkProgram(GLuint& shaderProgram) {
     glLinkProgram(shaderProgram);
 }
 
 void GLBackend::useProgram(GLuint shaderProgram) {
     glUseProgram(shaderProgram);
 }
+
+// uniform
 
 GLuint GLBackend::getUniformLocation(ShaderProgram shaderProgram, const std::string &uniformName) {
     return glGetUniformLocation(shaderProgram, uniformName.c_str());
@@ -112,13 +114,19 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const g
     glProgramUniform4fv(shaderProgram, location, 1, glm::value_ptr(value));
 }
 
-void GLBackend::drawIndexed(const GPUMesh &gpuMesh, GLuint shaderProgram) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value) {
+    glProgramUniformMatrix4fv(shaderProgram, location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+// draw
+
+void GLBackend::drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram) {
     glUseProgram(shaderProgram);
     glBindVertexArray(gpuMesh.vao);
     glDrawElements(GL_TRIANGLES, gpuMesh.indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void GLBackend::destroyMesh(GPUMesh &gpuMesh) {
+void GLBackend::destroyMesh(GPUMesh& gpuMesh) {
     glDeleteBuffers(1, &gpuMesh.vbo);
     glDeleteBuffers(1, &gpuMesh.ebo);
     glDeleteVertexArrays(1, &gpuMesh.vao);
