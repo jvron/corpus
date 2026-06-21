@@ -24,15 +24,15 @@ enum class Key : int32_t {
 
 namespace Input {
     // engine systems
-    void init(World &world);
-    void resetKeyStates(World &world);
-    void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
+    void init(World& world);
+    void resetKeyStates(World& world);
+    void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // game systems
-    bool isKeyPressed(World &world, Key key);
-    bool isKeyReleased(World &world, Key key);
-    bool isKeyDown(World &world, Key key);
+    bool isKeyPressed(World& world, Key key);
+    bool isKeyReleased(World& world, Key key);
+    bool isKeyDown(World& world, Key key);
 
     void enableCursor(World& world);
-    void disableCursor(World &world);
+    void disableCursor(World& world);
 }

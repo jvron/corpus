@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/world.hpp"
+struct World;
 
 namespace Window {
 
