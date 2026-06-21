@@ -18,6 +18,7 @@ struct WindowConfig { // user defined
 
 struct WindowState {
     GLFWwindow* handle = nullptr;
+    float aspect {};
 };
 
 struct InputState {

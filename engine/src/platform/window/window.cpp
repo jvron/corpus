@@ -2,16 +2,17 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "engine/window.hpp"
+#include "platform/window.hpp"
 #include "engine/world.hpp"
 
-void Window::create(World &world) {
+void Window::create(World& world) {
 
-    const WindowConfig &config = world.engineConfig.windowConfig;
+    const WindowConfig& config = world.engineConfig.windowConfig;
+    WindowState& windowState = world.engineState.windowState;
 
     if (!glfwInit()) {
 
-        std::cerr << "glfw init failed \n";
+        std::cerr << "[ERROR]: GLFW init failed \n";
         return;
     }
     // configuring OpenGL context for the window to be created
@@ -22,7 +23,7 @@ void Window::create(World &world) {
     GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title, nullptr,  nullptr);
     if (!handle) {
         glfwTerminate();
-        std::cerr << "glfw window creation failed \n";
+        std::cerr << "[ERROR]: GLFW window creation failed \n";
         return;
     }
 
@@ -30,25 +31,27 @@ void Window::create(World &world) {
 
     glfwSetWindowUserPointer(handle, &world); // store world pointer in the window
 
-    world.engineState.windowState.handle = handle;
+    windowState.handle = handle;
+    windowState.aspect = (float) world.engineConfig.windowConfig.width /  world.engineConfig.windowConfig.height;
 }
 
-bool Window::shouldClose(World &world) {
+bool Window::shouldClose(World& world) {
     return glfwWindowShouldClose(world.engineState.windowState.handle);
 }
 
 void Window::pollEvents(World&) {
     glfwPollEvents();
 }
-void Window::swapBuffers(World &world) {
+
+void Window::swapBuffers(World& world) {
     glfwSwapBuffers(world.engineState.windowState.handle);
 }
 
-void Window::destroy(World &world) {
+void Window::destroy(World& world) {
     glfwDestroyWindow(world.engineState.windowState.handle);
     glfwTerminate();
 }
 
-void Window::close(World &world) {
+void Window::close(World& world) {
     glfwSetWindowShouldClose(world.engineState.windowState.handle, true);
 } 
