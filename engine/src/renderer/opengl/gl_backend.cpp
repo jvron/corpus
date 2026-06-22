@@ -1,8 +1,8 @@
-#include <cstdint>
 #include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <cstddef>
+#include <algorithm>
+#include <cassert>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "gl_backend.hpp"
 #include "engine/world.hpp"
@@ -116,6 +116,67 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const g
 
 void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value) {
     glProgramUniformMatrix4fv(shaderProgram, location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+// texture
+
+void GLBackend::createTexture2D(GLuint& texture) {
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+}
+
+void GLBackend::allocateTexture2D(GLuint texture, int width, int height) {
+
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    int maxDim = std::max(width, height);    
+    int levels = static_cast<int>(std::floor(std::log2(maxDim))) + 1; // calculate number of mip levels 
+
+    glTextureStorage2D(texture, levels, GL_RGBA8, width, height); // allocate buffer
+}
+
+void GLBackend::uploadTexture2D(GLuint texture, int width, int height, void* pixels) {
+    glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels); // copy pixel data into buffer
+}
+
+GLenum GLBackend::toGLWrap(TexWrap wrap) {
+
+    switch (wrap) {
+        case TexWrap::Repeat:
+            return GL_REPEAT;
+        case TexWrap::MirroredRepeat:
+            return GL_MIRRORED_REPEAT;
+        case TexWrap::ClampToEdge:
+            return GL_CLAMP_TO_EDGE;
+        case TexWrap::ClampToBorder:
+            return GL_CLAMP_TO_BORDER;
+    }
+    assert(false && "[ERROR]: Unknown texture warp parameter");
+    return GL_REPEAT;
+}
+
+GLenum GLBackend::toGLFilter(TexFilter filter) {
+    
+    switch (filter) {
+        case TexFilter::Linear:
+            return GL_LINEAR;
+        case TexFilter::Nearest:
+            return GL_NEAREST;
+    }
+    assert(false && "[ERROR]: Unknown texture filter parameter");
+    return GL_LINEAR;
+}
+
+void GLBackend::setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT) {
+
+    glTextureParameteri(texture, GL_TEXTURE_WRAP_S, toGLWrap(wrapS));
+    glTextureParameteri(texture, GL_TEXTURE_WRAP_T, toGLWrap(wrapT));
+}
+
+void GLBackend::setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter) {
+
+    glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, toGLFilter(minFilter));
+    glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, toGLFilter(magFilter));
 }
 
 // draw

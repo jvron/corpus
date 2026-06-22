@@ -1,15 +1,29 @@
 #pragma once
-//#include <glad/glad.h>
+
+#include <cstdint>
 #include <GL/gl.h>
+#include <cstddef>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include <cstddef>
 
 #include "ecs/components.hpp"
-#include "engine/world.hpp"
-#include "resources/resource_manager.hpp"
 
 struct GPUMesh;
+struct VertexAttribute;
+
+using ShaderProgram = uint32_t;
+
+enum class TexWrap {
+    Repeat,
+    MirroredRepeat,
+    ClampToEdge,
+    ClampToBorder
+};
+
+enum class TexFilter {
+    Linear,
+    Nearest,
+};
 
 namespace GLBackend {
 
@@ -36,6 +50,14 @@ namespace GLBackend {
     GLuint getUniformLocation(ShaderProgram shaderProgram, const std::string& uniformName);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
+
+    void createTexture2D(GLuint& texture);
+    void allocateTexture2D(GLuint texture, int width, int height);
+    void uploadTexture2D(GLuint texture, int width, int height, void* pixels);
+    GLenum toGLWrap(TexWrap wrap);
+    GLenum toGLFilter(TexFilter filter);
+    void setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT);
+    void setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter);
 
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 
