@@ -53,11 +53,13 @@ namespace GLBackend {
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
 
-    void createTexture2D(GLuint& texture);
-    void allocateTexture2D(GLuint texture, int width, int height);
-    void uploadTexture2D(GLuint texture, int width, int height, void* pixels);
+    void createTexture2D(GLuint& texture);  
+    void allocateTexture2D(GLuint texture, TexFormat format, int width, int height);
+    void uploadTexture2D(GLuint texture, TexFormat format, int width, int height, void* data);
     GLenum toGLWrap(TexWrap wrap);
     GLenum toGLFilter(TexFilter filter);
+    GLenum toGLFormat(TexFormat format);
+    GLenum toGLInternalFormat(TexFormat format);
     void setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT);
     void setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter);
     void bindTextureUnit(GLuint texture, GLuint unit);

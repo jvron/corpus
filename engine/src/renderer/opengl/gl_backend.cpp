@@ -128,7 +128,7 @@ void GLBackend::createTexture2D(GLuint& texture) {
     glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 }
 
-void GLBackend::allocateTexture2D(GLuint texture, int width, int height) {
+void GLBackend::allocateTexture2D(GLuint texture, TexFormat format, int width, int height) {
 
     if (width <= 0 || height <= 0) {
         return;
@@ -136,11 +136,13 @@ void GLBackend::allocateTexture2D(GLuint texture, int width, int height) {
     int maxDim = std::max(width, height);    
     int levels = static_cast<int>(std::floor(std::log2(maxDim))) + 1; // calculate number of mip levels 
 
-    glTextureStorage2D(texture, levels, GL_RGB8, width, height); // allocate buffer
+    GLenum internalFormat = toGLInternalFormat(format);
+    glTextureStorage2D(texture, levels, internalFormat, width, height); // allocate buffer
 }
 
-void GLBackend::uploadTexture2D(GLuint texture, int width, int height, void* pixels) {
-    glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels); // copy pixel data into buffer
+void GLBackend::uploadTexture2D(GLuint texture, TexFormat format, int width, int height, void* data) {
+    GLenum glFormat = toGLFormat(format);
+    glTextureSubImage2D(texture, 0, 0, 0, width, height, glFormat, GL_UNSIGNED_BYTE, data); // copy pixel data into buffer
 }
 
 GLenum GLBackend::toGLWrap(TexWrap wrap) {
@@ -169,6 +171,38 @@ GLenum GLBackend::toGLFilter(TexFilter filter) {
     }
     assert(false && "[ERROR]: Unknown texture filter parameter");
     return GL_LINEAR;
+}
+
+GLenum GLBackend::toGLFormat(TexFormat format) {
+
+    switch (format) {
+        case TexFormat::RED:
+            return GL_RED;
+        case TexFormat::RG:
+            return GL_RG;
+        case TexFormat::RGB:
+            return GL_RGB;
+        case TexFormat::RGBA:
+            return GL_RGBA;
+    }
+    assert(false && "[ERROR]: Unsupported texture format");
+    return GL_RGBA;
+}
+
+GLenum GLBackend::toGLInternalFormat(TexFormat format) {
+
+    switch (format) {
+        case TexFormat::RED:
+            return GL_R8;
+        case TexFormat::RG:
+            return GL_RG8;
+        case TexFormat::RGB:
+            return GL_RGB8;
+        case TexFormat::RGBA:
+            return GL_RGBA8;
+    }
+    assert(false && "[ERROR]: Unsupported texture format");
+    return GL_RGBA8;
 }
 
 void GLBackend::setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT) {
