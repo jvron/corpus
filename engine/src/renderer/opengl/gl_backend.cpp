@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "gl_backend.hpp"
-#include "engine/world.hpp"
+#include "resources/asset_loader.hpp"
 #include "resources/resource_manager.hpp"
 
 void GLBackend::clearBuffer(Color& clearColor) {
@@ -118,6 +118,10 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const g
     glProgramUniformMatrix4fv(shaderProgram, location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, int value) {
+    glProgramUniform1i(shaderProgram, location, value);
+}
+
 // texture
 
 void GLBackend::createTexture2D(GLuint& texture) {
@@ -132,7 +136,7 @@ void GLBackend::allocateTexture2D(GLuint texture, int width, int height) {
     int maxDim = std::max(width, height);    
     int levels = static_cast<int>(std::floor(std::log2(maxDim))) + 1; // calculate number of mip levels 
 
-    glTextureStorage2D(texture, levels, GL_RGBA8, width, height); // allocate buffer
+    glTextureStorage2D(texture, levels, GL_RGB8, width, height); // allocate buffer
 }
 
 void GLBackend::uploadTexture2D(GLuint texture, int width, int height, void* pixels) {
@@ -177,6 +181,10 @@ void GLBackend::setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilte
 
     glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, toGLFilter(minFilter));
     glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, toGLFilter(magFilter));
+}
+
+void GLBackend::bindTextureUnit(GLuint texture, GLuint unit) {
+    glBindTextureUnit(unit, texture);
 }
 
 // draw

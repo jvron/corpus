@@ -7,6 +7,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "ecs/components.hpp"
+#include "resources/asset_loader.hpp"
 
 struct GPUMesh;
 struct VertexAttribute;
@@ -50,6 +51,7 @@ namespace GLBackend {
     GLuint getUniformLocation(ShaderProgram shaderProgram, const std::string& uniformName);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
+    void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
 
     void createTexture2D(GLuint& texture);
     void allocateTexture2D(GLuint texture, int width, int height);
@@ -58,6 +60,7 @@ namespace GLBackend {
     GLenum toGLFilter(TexFilter filter);
     void setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT);
     void setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter);
+    void bindTextureUnit(GLuint texture, GLuint unit);
 
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 
