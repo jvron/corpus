@@ -154,6 +154,33 @@ Texture& ResourceManager::getTexture(TextureHandle textureHandle) {
 void ResourceManager::setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& param) {
 
     Texture& texture = getTexture(textureHandle);
+
     GLBackend::setTexture2DWrap(texture.id, param.wrapS,  param.wrapT);
-    GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
+
+
+    auto isMipmapFilter = [](TexFilter f) {
+        return f == TexFilter::LinearMipmapLinear ||
+            f == TexFilter::LinearMipmapNearest ||
+            f == TexFilter::NearestMipmapNearest ||
+            f == TexFilter::NearestMipmapLinear;
+    };
+
+    if (param.enableMipmap) {
+
+        GLBackend::generateMipmap(texture.id);
+
+        if (!isMipmapFilter(param.minFilter)) {
+            std::cerr << "[ERROR]: Min filter is not a mipmap filter but mipmaps are enabled \n"; 
+            return;
+        }
+        GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
+    }
+    else {
+
+        if (isMipmapFilter(param.minFilter)) {
+            std::cerr << "[ERROR]: Mipmap filter provided but mipmaps are disabled \n"; 
+            return;
+        }
+        GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
+    }
 }

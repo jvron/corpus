@@ -66,6 +66,8 @@ struct Texture2DParam {
     TexWrap wrapT;
     TexFilter minFilter;
     TexFilter magFilter;
+
+    bool enableMipmap {true};
 };
 
 class ResourceManager {
