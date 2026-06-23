@@ -71,16 +71,21 @@ void Renderer::renderScene(World &world) {
     CameraSystem::updateProjection(world, camera, projection);
 
     for (const auto& [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
-
-        glm::mat4 model = glm::mat4(1.0f);
-
         //std::cerr << "[DEBUG]: Drawing Entity ID = " << entity.id << "\n";
         if (!renderable.visible) {
             continue;
         }
 
-        //ShaderProgram shaderProgram = world.resourceManager.getShaderProgram(material.shaderHandle);
+        glm::mat4 model = glm::mat4(1.0f);
+
         ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(material.shaderHandle);
+
+        Texture& texture = world.resourceManager.getTexture(material.textureHandle);
+        
+        uint32_t textureUnit = 0;
+        GLBackend::bindTextureUnit(texture.id, textureUnit);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uTexture"], textureUnit);
+        //std::cout << "[DEBUG]: uTexture location = " << shaderAsset.uniformLocations["uTexture"] << std::endl;
 
         model = glm::translate(model, transform.position);
         model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -93,7 +98,7 @@ void Renderer::renderScene(World &world) {
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uView"], view);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uProjection"], projection);
 
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
+        //GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
 
         GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
