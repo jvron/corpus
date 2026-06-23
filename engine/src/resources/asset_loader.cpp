@@ -18,3 +18,7 @@ ImageData AssetLoader::loadTexture(const std::string& filePath) {
 
     return imageData;
 } 
+
+void AssetLoader::freeData(void* data) {
+    stbi_image_free(data);
+}

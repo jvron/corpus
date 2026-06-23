@@ -134,8 +134,10 @@ TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
     Texture texture;
     GLBackend::createTexture2D(texture.id);
     GLBackend::allocateTexture2D(texture.id, imageData.width, imageData.height);
-    GLBackend::uploadTexture2D(texture.id, imageData.width, imageData.height, (void*)imageData.data);
+    GLBackend::uploadTexture2D(texture.id, imageData.width, imageData.height, imageData.data);
 
+    AssetLoader::freeData(imageData.data);
+    
     TextureHandle handle = textures.size();
     textures.push_back(texture);
 
