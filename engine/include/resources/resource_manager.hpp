@@ -8,6 +8,7 @@
 #include <cstdint>
 
 #include "ecs/components.hpp"
+#include "renderer/opengl/gl_backend.hpp"
 
 using ShaderProgram = uint32_t;
 
@@ -19,6 +20,7 @@ enum class ShaderType {
 struct Vertex {
     glm::vec3 position {};
     glm::vec4 color {};
+    glm::vec2 uv {};
 };
 
 struct VertexAttribute {
@@ -55,12 +57,24 @@ struct ShaderAsset {
     std::unordered_map<std::string, GLint> uniformLocations; 
 };
 
+struct Texture {
+    uint32_t id {};
+};
+
+struct Texture2DParam {
+    TexWrap wrapS;
+    TexWrap wrapT;
+    TexFilter minFilter;
+    TexFilter magFilter;
+};
+
 class ResourceManager {
 
 private:
     std::vector<ShaderProgram> shaderPrograms;
     std::vector<ShaderAsset> shaderAssets;
     std::vector<MeshAsset> meshAssets;
+    std::vector<Texture> textures;
 
     std::vector<GPUMesh> gpuMeshes;
 
@@ -79,4 +93,8 @@ public:
 
     void insertGPUMesh(MeshHandle meshHandle, const GPUMesh &gpuMesh);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
+
+    TextureHandle loadTexture(const std::string& texturePath);
+    Texture& getTexture(TextureHandle textureHandle);
+    void setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& parameters);
 };

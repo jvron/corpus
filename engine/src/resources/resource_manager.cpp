@@ -10,6 +10,7 @@
 #include "resources/resource_manager.hpp"
 #include "ecs/components.hpp"
 #include "renderer/opengl/gl_backend.hpp"
+#include "resources/asset_loader.hpp"
 
 std::string ResourceManager::readFile(const std::string &filePath) {
 
@@ -80,14 +81,10 @@ ShaderProgram ResourceManager::getShaderProgram(ShaderHandle shaderHandle) {
     return shaderPrograms[shaderHandle];
 }
 
-
-
 ShaderAsset& ResourceManager::getShaderAsset(ShaderHandle shaderHandle) {
     assert(!(shaderHandle >= shaderPrograms.size()) && "[ERROR]: Shader program does not exist");
     return shaderAssets[shaderHandle];
 }
-
-
 
 void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName) {
 
@@ -124,7 +121,37 @@ void ResourceManager::insertGPUMesh(MeshHandle meshHandle, const GPUMesh &gpuMes
 }
 
 GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
+
     assert(!(meshHandle >= gpuMeshes.size()) && "Error: GPUMesh does not exist");
 
     return gpuMeshes[meshHandle]; 
+}
+
+TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
+
+    ImageData imageData = AssetLoader::loadTexture(filePath);
+
+    Texture texture;
+    GLBackend::createTexture2D(texture.id);
+    GLBackend::allocateTexture2D(texture.id, imageData.width, imageData.height);
+    GLBackend::uploadTexture2D(texture.id, imageData.width, imageData.height, (void*)imageData.data);
+
+    TextureHandle handle = textures.size();
+    textures.push_back(texture);
+
+    return handle;
+}
+
+Texture& ResourceManager::getTexture(TextureHandle textureHandle) {
+    
+    assert(!(textureHandle >= textures.size()) && "Error: Texture does not exist");
+
+    return textures[textureHandle]; 
+}
+
+void ResourceManager::setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& param) {
+
+    Texture& texture = getTexture(textureHandle);
+    GLBackend::setTexture2DWrap(texture.id, param.wrapS,  param.wrapT);
+    GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
 }
