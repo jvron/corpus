@@ -24,6 +24,13 @@ enum class TexWrap {
 enum class TexFilter {
     Linear,
     Nearest,
+
+    // mipmap filters 
+    NearestMipmapNearest,
+    NearestMipmapLinear,
+
+    LinearMipmapLinear,
+    LinearMipmapNearest
 };
 
 namespace GLBackend {
@@ -63,6 +70,7 @@ namespace GLBackend {
     void setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT);
     void setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter);
     void bindTextureUnit(GLuint texture, GLuint unit);
+    void generateMipmap(GLuint texture);
 
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 

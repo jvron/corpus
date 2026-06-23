@@ -150,10 +150,13 @@ GLenum GLBackend::toGLWrap(TexWrap wrap) {
     switch (wrap) {
         case TexWrap::Repeat:
             return GL_REPEAT;
+
         case TexWrap::MirroredRepeat:
             return GL_MIRRORED_REPEAT;
+
         case TexWrap::ClampToEdge:
             return GL_CLAMP_TO_EDGE;
+            
         case TexWrap::ClampToBorder:
             return GL_CLAMP_TO_BORDER;
     }
@@ -166,8 +169,21 @@ GLenum GLBackend::toGLFilter(TexFilter filter) {
     switch (filter) {
         case TexFilter::Linear:
             return GL_LINEAR;
+
         case TexFilter::Nearest:
             return GL_NEAREST;
+
+        case TexFilter::NearestMipmapNearest:
+            return GL_NEAREST_MIPMAP_NEAREST;
+
+        case TexFilter::NearestMipmapLinear:
+            return GL_NEAREST_MIPMAP_LINEAR;
+
+        case TexFilter::LinearMipmapLinear:
+            return GL_LINEAR_MIPMAP_LINEAR;
+
+        case TexFilter::LinearMipmapNearest:
+            return GL_LINEAR_MIPMAP_NEAREST;
     }
     assert(false && "[ERROR]: Unknown texture filter parameter");
     return GL_LINEAR;
@@ -221,6 +237,10 @@ void GLBackend::bindTextureUnit(GLuint texture, GLuint unit) {
     glBindTextureUnit(unit, texture);
 }
 
+void GLBackend::generateMipmap(GLuint texture) {
+    glGenerateTextureMipmap(texture);
+}
+ 
 // draw
 
 void GLBackend::drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram) {
