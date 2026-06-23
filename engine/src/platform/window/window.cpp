@@ -20,7 +20,7 @@ void Window::create(World& world) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title, nullptr,  nullptr);
+    GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title.c_str(), nullptr,  nullptr);
     if (!handle) {
         glfwTerminate();
         std::cerr << "[ERROR]: GLFW window creation failed \n";

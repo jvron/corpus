@@ -8,12 +8,11 @@
 constexpr int32_t keyCount = 348; 
 
 struct GLFWwindow;
-typedef unsigned int GLuint;
 
 struct WindowConfig { // user defined
     int width {};
     int height {};
-    const char* title = nullptr;
+    std::string title;
 };
 
 struct WindowState {

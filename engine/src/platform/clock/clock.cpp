@@ -29,7 +29,7 @@ void Clock::tick(World &world) {
 
     if (currentTime - fpsLastTime >= 1.0) {
         //std::cout << "\r FPS: " << std::to_string(fpsCounter) << std::flush;
-        std::string title = world.engineConfig.windowConfig.title + std::string("   FPS: ") + std::to_string(framesThisSecond) ;
+        std::string title = world.engineConfig.windowConfig.title + "   FPS: " + std::to_string(framesThisSecond) ;
         glfwSetWindowTitle(world.engineState.windowState.handle, title.c_str());
 
         fpsLastTime = currentTime;
