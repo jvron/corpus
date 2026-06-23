@@ -1,13 +1,12 @@
 #pragma once 
 
-#include "glm/ext/vector_float3.hpp"
-#include "glm/ext/vector_float4.hpp"
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <cstdint>
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
+using TextureHandle = uint32_t;
 using EntityID = uint32_t;
 
 struct Entity {
@@ -35,6 +34,7 @@ struct Renderable {
 
 struct Material {
     ShaderHandle shaderHandle {};
+    TextureHandle textureHandle {};
     glm::vec4 baseColor {1.0f, 1.0f, 1.0f, 1.0f};
 };
 
