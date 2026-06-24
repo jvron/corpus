@@ -79,11 +79,8 @@ private:
     std::vector<Texture> textures;
 
     std::vector<GPUMesh> gpuMeshes;
-
-    std::string readFile(const std::string& filePath);
     
 public:
-
     ShaderHandle createShaderProgram(const std::vector<std::string> &shaderPaths);
     ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
 

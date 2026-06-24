@@ -1,8 +1,27 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "resources/asset_loader.hpp"
+
+std::string AssetLoader::readFile(const std::string &filePath) {
+
+    std::ifstream file;
+    file.open(filePath);
+    
+    if (!file) {
+        std::cerr << "[ERROR]: File not found at "<< filePath <<"\n";
+        return "";
+    }
+
+    std::stringstream stream;
+    stream << file.rdbuf();
+    file.close();
+
+    return stream.str();
+}
 
 ImageData AssetLoader::loadTexture(const std::string& filePath) {
 

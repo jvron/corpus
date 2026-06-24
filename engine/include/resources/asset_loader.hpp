@@ -15,6 +15,8 @@ struct ImageData {
 };
 
 namespace AssetLoader  {
+
+    std::string readFile(const std::string& filePath);
     ImageData loadTexture(const std::string& filePath);
     void freeData(void* data);
 }

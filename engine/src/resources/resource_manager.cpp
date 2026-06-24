@@ -12,22 +12,6 @@
 #include "renderer/opengl/gl_backend.hpp"
 #include "resources/asset_loader.hpp"
 
-std::string ResourceManager::readFile(const std::string &filePath) {
-
-    std::ifstream file;
-    file.open(filePath);
-    
-    if (!file) {
-        std::cerr << "Error: File not found at "<< filePath <<"\n";
-        return "";
-    }
-
-    std::stringstream stream;
-    stream << file.rdbuf();
-    file.close();
-
-    return stream.str();
-}
 
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
@@ -35,7 +19,7 @@ ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string>
     
     for (const auto &path : filePaths) {
 
-        std::string shaderSource = readFile(path);
+        std::string shaderSource = AssetLoader::readFile(path);
 
         if (shaderSource.empty()) {
             std::cerr << "[ERROR]: Skipping shader program " << " due to missing file: " << path << "\n";
