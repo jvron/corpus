@@ -47,6 +47,7 @@ public:
         if (getPool<T>() != nullptr) {
             return;
         }
+
         SparseSet pool = SparseSet(sizeof(T));
         uint32_t componentId = getId<T>(); 
 
@@ -57,12 +58,24 @@ public:
     }
 
     template <typename T>
-    T& getComponent(Entity entity) { //assumes that the entity exists (to be used by view and not by the game)
+    T& getComponent(Entity entity) { 
 
         SparseSet* pool = getPool<T>();
-        assert(pool != nullptr && "Error: requested pool does not exist");
+        assert(pool != nullptr && "[ERROR]: Requested pool does not exist");
 
-        return *static_cast<T*>(pool->getRaw(entity));
+        T* component = static_cast<T*>(pool->getRaw(entity));
+        assert(component != nullptr && "[ERROR]: Invalid entity provided");
+
+        return *component;
+    }
+
+    template <typename T>
+    T& getComponentUnsafe(Entity entity) { //assumes that the entity exists (to be used by view and not by the game)
+
+        SparseSet* pool = getPool<T>();
+        assert(pool != nullptr && "[ERROR]: Requested pool does not exist");
+
+        return *static_cast<T*>(pool->getRawUnsafe(entity));
     }
 
     template <typename T>

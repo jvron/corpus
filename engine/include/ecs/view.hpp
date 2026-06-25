@@ -74,7 +74,7 @@ public:
 
         std::tuple<Entity, Component& ...> operator*() {
             Entity entity = pool.denseEntities[index];
-            return {entity, view.registryRef.template getComponent<Component>(entity) ...} ;
+            return {entity, view.registryRef.template getComponentUnsafe<Component>(entity) ...} ;
         }
 
         bool operator!=(const Iterator& other) {
