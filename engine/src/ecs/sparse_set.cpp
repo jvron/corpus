@@ -1,9 +1,10 @@
-#include "ecs/sparse_set.hpp"
-#include "ecs/components.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+
+#include "ecs/sparse_set.hpp"
+#include "ecs/components.hpp"
 
 size_t SparseSet::size() const {
     return denseEntities.size();
@@ -11,9 +12,9 @@ size_t SparseSet::size() const {
 
 bool SparseSet::hasEntity(Entity entity) const {
     //std::cerr << "[DEBUG]: Checking Entity ID: " << entity.id << "\n";
-    uint32_t denseIndex = sparse[entity.id];
+    int denseIndex = sparse[entity.id];
    
-    if (denseIndex >= denseEntities.size() || denseIndex < 0) {
+    if (denseIndex >= (int)denseEntities.size() || denseIndex < 0) {
         return false;
     }
 
@@ -74,14 +75,19 @@ void SparseSet::remove(Entity entity) {
     denseComponents.resize(denseComponents.size() - componentSize);
 }
 
-void* SparseSet::getRaw(Entity entity) {
+
+void* SparseSet::getRawUnsafe(Entity entity) {
     
+    int denseIndex = sparse[entity.id];
+    std::byte* component = denseComponents.data() + (denseIndex * componentSize);
+    
+    return static_cast<void*>(component);
+}
+
+void* SparseSet::getRaw(Entity entity) {
+
     if (!hasEntity(entity)) {
         return nullptr;
     }
-    int denseIndex = sparse[entity.id];
-
-    std::byte* component = denseComponents.data() + (denseIndex * componentSize);
-
-    return static_cast<void*>(component);
+    return getRawUnsafe(entity);
 }

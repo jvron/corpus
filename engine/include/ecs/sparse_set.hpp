@@ -30,5 +30,6 @@ public:
 
     // return pointer to component source bytes 
     void* getRaw(Entity entity);
+    void* getRawUnsafe(Entity entity); 
 
 };
