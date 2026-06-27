@@ -13,6 +13,7 @@
 #include "resources/asset_loader.hpp"
 
 
+
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
     ShaderProgram program = GLBackend::createShaderProgram();
@@ -76,7 +77,7 @@ void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::s
 
     if (shaderAsset.uniformLocations.find(uniformName) == shaderAsset.uniformLocations.end()) {
         GLuint location = GLBackend::getUniformLocation(shaderAsset.shaderProgram, uniformName);
-        //std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
+        std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
         shaderAsset.uniformLocations[uniformName] = location;
     }
 }
@@ -167,4 +168,25 @@ void ResourceManager::setTexture2DParameters(TextureHandle textureHandle, const 
         }
         GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
     }
+}
+
+void ResourceManager::destroy() {
+
+    for (ShaderProgram& program : shaderPrograms) {
+        GLBackend::deleteShaderProgram(program);
+    }
+
+    for (GPUMesh& gpuMesh : gpuMeshes) {
+        GLBackend::destroyMesh(gpuMesh);
+    }
+
+    for (Texture& texture : textures) {
+        GLBackend::deleteTexture(texture.id);
+    }
+
+    shaderPrograms.clear();
+    shaderAssets.clear();
+    textures.clear();
+    meshAssets.clear();
+    gpuMeshes.clear();
 }

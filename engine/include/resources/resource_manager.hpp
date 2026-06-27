@@ -81,19 +81,22 @@ private:
     std::vector<GPUMesh> gpuMeshes;
     
 public:
-    ShaderHandle createShaderProgram(const std::vector<std::string> &shaderPaths);
+
+    ShaderHandle createShaderProgram(const std::vector<std::string>& shaderPaths);
     ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
 
     ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
     void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);
 
-    Mesh insertMeshAsset(const MeshAsset &meshAsset);
+    Mesh insertMeshAsset(const MeshAsset& meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 
-    void insertGPUMesh(MeshHandle meshHandle, const GPUMesh &gpuMesh);
+    void insertGPUMesh(MeshHandle meshHandle, const GPUMesh& gpuMesh);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
     TextureHandle loadTexture(const std::string& texturePath);
     Texture& getTexture(TextureHandle textureHandle);
     void setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& parameters);
+
+    void destroy();
 };
