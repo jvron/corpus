@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <string>
 
 #include "ecs/components.hpp"
 #include "resources/asset_loader.hpp"
@@ -59,6 +60,7 @@ namespace GLBackend {
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
+    void setUniform(ShaderProgram shaderProgram, GLuint location, float value);
 
     void createTexture2D(GLuint& texture);  
     void allocateTexture2D(GLuint texture, TexFormat format, int width, int height);

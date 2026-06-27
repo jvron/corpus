@@ -122,6 +122,10 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, int val
     glProgramUniform1i(shaderProgram, location, value);
 }
 
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, float value) {
+    glProgramUniform1f(shaderProgram, location, value);
+}
+
 // texture
 
 void GLBackend::createTexture2D(GLuint& texture) {
