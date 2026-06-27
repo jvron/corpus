@@ -58,6 +58,7 @@ namespace GLBackend {
 
     GLuint getUniformLocation(ShaderProgram shaderProgram, const std::string& uniformName);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
+    void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec3& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, float value);

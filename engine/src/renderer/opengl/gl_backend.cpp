@@ -114,6 +114,10 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const g
     glProgramUniform4fv(shaderProgram, location, 1, glm::value_ptr(value));
 }
 
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec3& value) {
+    glProgramUniform3fv(shaderProgram, location, 1, glm::value_ptr(value));
+}
+
 void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value) {
     glProgramUniformMatrix4fv(shaderProgram, location, 1, GL_FALSE, glm::value_ptr(value));
 }
