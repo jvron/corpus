@@ -257,8 +257,18 @@ void GLBackend::destroyMesh(GPUMesh& gpuMesh) {
     glDeleteBuffers(1, &gpuMesh.vbo);
     glDeleteBuffers(1, &gpuMesh.ebo);
     glDeleteVertexArrays(1, &gpuMesh.vao);
+
+    gpuMesh = {};
 }
 
-void GLBackend::deleteShaderProgram(ShaderProgram program) {
+void GLBackend::deleteShaderProgram(ShaderProgram& program) {
     glDeleteProgram(program);
+
+    program = 0;
+}
+
+void GLBackend::deleteTexture(GLuint& texture) {
+    glDeleteTextures(1, &texture);
+
+    texture = 0;
 }

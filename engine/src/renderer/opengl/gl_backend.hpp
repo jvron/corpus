@@ -77,5 +77,6 @@ namespace GLBackend {
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 
     void destroyMesh(GPUMesh& gpuMesh);
-    void deleteShaderProgram(ShaderProgram program);
+    void deleteShaderProgram(ShaderProgram& program);
+    void deleteTexture(GLuint& texture);
 }
