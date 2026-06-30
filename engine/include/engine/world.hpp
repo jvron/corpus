@@ -52,6 +52,9 @@ struct Time {
     double elapsedTime {};
 
     uint32_t frameCount {}; // total number of frames since startup
+    
+    double fpsTimer {};
+    int framesThisSecond {};
 };
 
 struct EngineState {
