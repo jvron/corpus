@@ -17,6 +17,7 @@ void Engine::startUp(World &world) {
     Window::create(world);
     Renderer::init(world);
     Input::init(world);
+    Clock::init(world);
 
     scheduler.init(world);
     
@@ -44,6 +45,8 @@ void Engine::run(World &world) {
     
     while (!Window::shouldClose(world)) {
 
+        Clock::tick(world);
+
         scheduler.runStage(Stage::Begin);
         scheduler.runStage(Stage::Input);
         scheduler.runStage(Stage::Update);
@@ -53,5 +56,7 @@ void Engine::run(World &world) {
 }
 
 void Engine::shutDown(World& world) {
+
+    world.resourceManager.destroy();
     Window::destroy(world);
 }
