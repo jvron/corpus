@@ -63,6 +63,9 @@ namespace GLBackend {
     void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
     void setUniform(ShaderProgram shaderProgram, GLuint location, float value);
 
+    void createUBO(GLuint& ubo, size_t size, GLuint bindingSlot);
+    void updateUBO(GLuint& ubo, size_t size, const void* data);
+
     void createTexture2D(GLuint& texture);  
     void allocateTexture2D(GLuint texture, TexFormat format, int width, int height);
     void uploadTexture2D(GLuint texture, TexFormat format, int width, int height, void* data);

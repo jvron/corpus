@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <glad/glad.h>
 #include <algorithm>
 #include <cassert>
@@ -18,7 +19,7 @@ void GLBackend::createBuffer(GLuint& buffer) {
 }
 
 void GLBackend::uploadBuffer(GLuint buffer, size_t size , const void* data) {
-    glNamedBufferStorage(buffer, size, data, 0); //immutable buffer
+    glNamedBufferStorage(buffer, size, data, 0); //immutable static buffer  
 }
 
 // vertex array
@@ -34,7 +35,7 @@ void GLBackend::attachElementBuffer(GLuint vao, GLuint buffer) {
     glVertexArrayElementBuffer(vao, buffer);
 }
 
-void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttribute &attribute) { 
+void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttribute& attribute) { 
 
     glEnableVertexArrayAttrib(vao, attribute.location); // enable attribute layout location slot at specified location 
     // set vertex attribute layout at the location
@@ -128,6 +129,20 @@ void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, int val
 
 void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, float value) {
     glProgramUniform1f(shaderProgram, location, value);
+}
+
+// UBO
+
+void GLBackend::createUBO(GLuint& ubo, size_t size, GLuint bindingPoint) {
+    glCreateBuffers(1, &ubo);
+
+    glNamedBufferStorage(ubo, size, nullptr, GL_DYNAMIC_STORAGE_BIT); // immutable dynamic buffer
+
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo); // set the binding point
+}
+
+void GLBackend::updateUBO(GLuint& ubo, size_t size, const void* data) {
+    glNamedBufferSubData(ubo, 0, size, data);
 }
 
 // texture
