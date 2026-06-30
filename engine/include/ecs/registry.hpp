@@ -81,9 +81,17 @@ public:
     template <typename T>
     void insert(Entity entity, const T& component) {
 
-        assert(getPool<T>() != nullptr && "Error: component type must be registered via registerComponent<T>() before insertion");
+        assert(getPool<T>() != nullptr && "[ERROR]: Component type must be registered via registerComponent<T>() before insertion");
         uint32_t componentId = getId<T>();
 
         pools[componentId].write(entity, &component);
+    }
+
+    template <typename ... T>
+    void insertComponents(Entity entity, const T&... components  ) {
+
+        static_assert(sizeof...(T) > 0, "Must provide atleast one component");
+
+        (insert(entity, components), ...);
     }
 };
