@@ -55,4 +55,7 @@ struct CameraController {
     float pitch {};
 
     float sensitivityMultiplier {1.0f};
+
+    bool enableMouseLook {true};
+    bool enableMovement {true};
 };
