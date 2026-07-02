@@ -16,7 +16,7 @@ void CameraControlSystem::update(World& world) {
     
     Camera& camera = world.registry.getComponent<Camera>(world.activeCamera);
 
-    InputState& inputState = world.engineState.inputState;
+    const InputState& inputState = world.engineState.inputState;
 
     ctrl.yaw += inputState.mouseDeltaX * world.engineConfig.inputConfig.sensitivity * ctrl.sensitivityMultiplier;
     ctrl.pitch += inputState.mouseDeltaY * world.engineConfig.inputConfig.sensitivity * ctrl.sensitivityMultiplier;
@@ -27,10 +27,7 @@ void CameraControlSystem::update(World& world) {
     if (ctrl.pitch < -89.0f) {
         ctrl.pitch = -89.0f;
     }
-    
-    inputState.mouseDeltaX = 0.0f;
-    inputState.mouseDeltaY = 0.0f;
-    
+
     glm::vec3 direction;
     direction.x = cos(glm::radians(ctrl.yaw)) * cos(glm::radians(ctrl.pitch));
     direction.y = sin(glm::radians(ctrl.pitch));

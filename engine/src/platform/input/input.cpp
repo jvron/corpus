@@ -13,7 +13,7 @@ void Input::init(World& world) {
     glfwSetCursorPosCallback(world.engineState.windowState.handle, cursorCallback);
 }
 
-void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods ) {
+void Input::keyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods ) {
 
     World* worldHandle = static_cast<World*>(glfwGetWindowUserPointer(window)); // get registry pointer from window
     
@@ -21,7 +21,7 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
         return;
     }
 
-    World &world = *worldHandle;
+    World& world = *worldHandle;
     switch (action) {
         case GLFW_PRESS:
             world.engineState.inputState.keyPressed[key] = true;
@@ -57,12 +57,15 @@ void Input::cursorCallback(GLFWwindow* window, double xPos, double yPos) {
     inputState.lastMouseY = yPos;
 }
 
-void Input::resetKeyStates(World& world) {
+void Input::resetInputState(World& world) {
     
     InputState &inputState = world.engineState.inputState;
     
     memset(inputState.keyPressed, 0, sizeof(inputState.keyPressed));
     memset(inputState.keyReleased, 0, sizeof(inputState.keyReleased));
+
+    inputState.mouseDeltaX = 0.0f;
+    inputState.mouseDeltaY = 0.0f;
 }
 
 bool Input::isKeyPressed(World& world, Key key) {
@@ -81,10 +84,14 @@ bool Input::isKeyDown(World& world, Key key) {
 }
 
 void Input::enableCursor(World& world) {
+
     glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    world.engineState.inputState.cursorEnabled = true;
 }
 
 void Input::disableCursor(World& world) {
+
     glfwSetInputMode(world.engineState.windowState.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    world.engineState.inputState.cursorEnabled = false;
 }
 

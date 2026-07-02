@@ -31,8 +31,8 @@ void Engine::startUp(World &world) {
     world.registry.registerComponent<Light>();
 
     scheduler.addSystem(Stage::Begin, Window::pollEvents);
-    scheduler.addSystem(Stage::Update, Input::resetKeyStates);
     scheduler.addSystem(Stage::Update, CameraControlSystem::update);
+    scheduler.addSystem(Stage::Update, Input::resetInputState);
     scheduler.addSystem(Stage::Render, Renderer::beginFrame);
     scheduler.addSystem(Stage::Render, Renderer::renderScene);
     scheduler.addSystem(Stage::End, Window::swapBuffers);
