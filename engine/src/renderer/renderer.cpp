@@ -28,36 +28,6 @@ void Renderer::init(World &world) {
     GLBackend::createUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), BlockBinding::lightBlock);
 }
 
-void Renderer::uploadMesh(World &world) {
-
-    for (const auto& [entity, mesh] : View<Mesh>(world.registry)) {
-       
-        //std::cout << "[DEBUG]: UploadMesh found Entity with ID = " << entity.id << "\n";
-        MeshAsset& meshAsset = world.resourceManager.getMeshAsset(mesh.meshHandle);
-
-        GPUMesh gpuMesh;
-        GLBackend::createVertexArray(gpuMesh.vao);
-        GLBackend::createBuffer(gpuMesh.vbo);
-        GLBackend::createBuffer(gpuMesh.ebo);
-        gpuMesh.indexCount = meshAsset.indices.size();
-
-        //std::cout << "[DEBUG]: Uploading mesh indices size: " << meshAsset.indices.size() << "\n";
-        //std::cout << "[DEBUG]: Uploading mesh vertices size: " << meshAsset.vertices.size() << "\n";
-
-        GLBackend::uploadBuffer(gpuMesh.vbo, meshAsset.vertices.size() * sizeof(Vertex), meshAsset.vertices.data());
-        GLBackend::uploadBuffer(gpuMesh.ebo, meshAsset.indices.size() * sizeof(uint32_t), meshAsset.indices.data());
-
-        GLBackend::attachVertexBuffer(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshAsset.vertexLayout.stride);
-        GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
-
-        for (const VertexAttribute &attribute : meshAsset.vertexLayout.attributes) {
-            GLBackend::setAttribute(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, attribute);
-        }
-
-        world.resourceManager.insertGPUMesh(mesh.meshHandle, gpuMesh);
-    }
-}
-
 GPULightBlock Renderer::gatherLightData(World& world) {
 
     GPULightBlock lightData;

@@ -28,7 +28,7 @@ void Engine::startUp(World &world) {
     world.registry.registerComponent<Transform>();
     world.registry.registerComponent<Camera>();
     world.registry.registerComponent<CameraController>();
-    world.registry.registerComponent<Light>();
+    world.registry.registerComponent<PointLight>();
 
     scheduler.addSystem(Stage::Begin, Window::pollEvents);
     scheduler.addSystem(Stage::Update, CameraControlSystem::update);
@@ -41,8 +41,8 @@ void Engine::startUp(World &world) {
 
 void Engine::run(World &world) {
 
-    Renderer::uploadMesh(world);
-    
+    world.resourceManager.buildGPUMesh(world);
+
     while (!Window::shouldClose(world)) {
 
         Clock::tick(world);

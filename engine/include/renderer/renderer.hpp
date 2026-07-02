@@ -19,8 +19,6 @@ struct GPULightBlock {
 
 namespace Renderer {
     void init(World& world);
-    
-    void uploadMesh(World& world);
 
     GPULightBlock gatherLightData(World& world);
 

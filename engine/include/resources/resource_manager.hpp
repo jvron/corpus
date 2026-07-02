@@ -10,6 +10,8 @@
 #include "ecs/components.hpp"
 #include "renderer/opengl/gl_backend.hpp"
 
+struct World;
+
 using ShaderProgram = uint32_t;
 
 enum class ShaderType {
@@ -21,6 +23,7 @@ struct Vertex {
     glm::vec3 position {};
     glm::vec4 color {};
     glm::vec2 uv {};
+    glm::vec3 normal {};
 };
 
 struct VertexAttribute {
@@ -92,6 +95,7 @@ public:
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 
     void insertGPUMesh(MeshHandle meshHandle, const GPUMesh& gpuMesh);
+    void buildGPUMesh(World& world);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
     TextureHandle loadTexture(const std::string& texturePath);

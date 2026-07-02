@@ -1,17 +1,16 @@
 #include <cassert>
 #include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
 #include "resources/resource_manager.hpp"
 #include "ecs/components.hpp"
+#include "ecs/view.hpp"
+#include "engine/world.hpp"
 #include "renderer/opengl/gl_backend.hpp"
 #include "resources/asset_loader.hpp"
-
 
 
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
@@ -103,6 +102,32 @@ void ResourceManager::insertGPUMesh(MeshHandle meshHandle, const GPUMesh &gpuMes
         gpuMeshes.resize(gpuMeshes.size() + 1);
     }
     gpuMeshes[meshHandle] = gpuMesh;
+}
+
+void ResourceManager::buildGPUMesh(World& world) {
+
+    for (auto [entity, mesh] : View<Mesh>(world.registry)) {
+       
+        const MeshAsset& meshAsset = getMeshAsset(mesh.meshHandle);
+
+        GPUMesh gpuMesh;
+        GLBackend::createVertexArray(gpuMesh.vao);
+        GLBackend::createBuffer(gpuMesh.vbo);
+        GLBackend::createBuffer(gpuMesh.ebo);
+        gpuMesh.indexCount = meshAsset.indices.size();
+
+        GLBackend::uploadBuffer(gpuMesh.vbo, meshAsset.vertices.size() * sizeof(Vertex), meshAsset.vertices.data());
+        GLBackend::uploadBuffer(gpuMesh.ebo, meshAsset.indices.size() * sizeof(uint32_t), meshAsset.indices.data());
+
+        GLBackend::attachVertexBuffer(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshAsset.vertexLayout.stride);
+        GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
+
+        for (const VertexAttribute &attribute : meshAsset.vertexLayout.attributes) {
+            GLBackend::setAttribute(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, attribute);
+        }
+
+        insertGPUMesh(mesh.meshHandle, gpuMesh);
+    }
 }
 
 GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
