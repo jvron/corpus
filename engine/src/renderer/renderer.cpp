@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <iostream>
+#include <vector>
 #include <glm/ext/matrix_transform.hpp>
 
 #include "engine/systems.hpp"
@@ -21,8 +22,10 @@ void Renderer::init(World &world) {
 
     glViewport(0, 0, world.engineConfig.windowConfig.width, world.engineConfig.windowConfig.height);
 
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);  
+
+    GLBackend::createUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), BlockBinding::lightBlock);
 }
 
 void Renderer::uploadMesh(World &world) {
@@ -30,7 +33,7 @@ void Renderer::uploadMesh(World &world) {
     for (const auto& [entity, mesh] : View<Mesh>(world.registry)) {
        
         //std::cout << "[DEBUG]: UploadMesh found Entity with ID = " << entity.id << "\n";
-        MeshAsset &meshAsset = world.resourceManager.getMeshAsset(mesh.meshHandle);
+        MeshAsset& meshAsset = world.resourceManager.getMeshAsset(mesh.meshHandle);
 
         GPUMesh gpuMesh;
         GLBackend::createVertexArray(gpuMesh.vao);
@@ -55,9 +58,34 @@ void Renderer::uploadMesh(World &world) {
     }
 }
 
+GPULightBlock Renderer::gatherLightData(World& world) {
+
+    GPULightBlock lightData;
+    int count = 0;
+
+    for (const auto& [entity, light, transform] : View<PointLight, Transform>(world.registry)) {
+
+        GPUPointLight pointLight;
+        if (count >= 32) {
+            break;
+        }
+
+        pointLight.color = glm::vec4(light.color, light.ambientStrength);
+        pointLight.position = glm::vec4(transform.position, light.radius);
+
+        lightData.pointLight[count] = pointLight;
+        count++;
+    }
+    lightData.lightCount = count;
+    return lightData;
+}
+
 void Renderer::beginFrame(World &world) {
     
     GLBackend::clearBuffer(world.engineState.renderState.clearColor);
+
+    GPULightBlock lightData = gatherLightData(world);
+    GLBackend::updateUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), &lightData);
 }
 
 void Renderer::renderScene(World &world) {
@@ -71,7 +99,7 @@ void Renderer::renderScene(World &world) {
     CameraSystem::updateProjection(world, camera, projection);
 
     for (const auto& [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
-        //std::cerr << "[DEBUG]: Drawing Entity ID = " << entity.id << "\n";
+
         if (!renderable.visible) {
             continue;
         }
@@ -81,11 +109,9 @@ void Renderer::renderScene(World &world) {
         ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(material.shaderHandle);
 
         Texture& texture = world.resourceManager.getTexture(material.textureHandle);
-        
-        uint32_t textureUnit = 0;
+        int textureUnit = 0;
         GLBackend::bindTextureUnit(texture.id, textureUnit);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uTexture"], textureUnit);
-        //std::cout << "[DEBUG]: uTexture location = " << shaderAsset.uniformLocations["uTexture"] << std::endl;
 
         model = glm::translate(model, transform.position);
         model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -97,9 +123,13 @@ void Renderer::renderScene(World &world) {
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], model);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uView"], view);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uProjection"], projection);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
 
-        //GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
-
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], material.specularStrength);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShine"], material.shine);
+        
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uViewPos"], camera.position);
+    
         GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
     }
