@@ -1,29 +1,28 @@
 add_library(engine STATIC)
 
-# ------------------------
 # Source files
-# ------------------------
+
 file(GLOB_RECURSE ENGINE_SRC CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
 target_sources(engine PRIVATE ${ENGINE_SRC})
 
-# ------------------------
 # Engine include directories
-# ------------------------
+
 target_include_directories(engine
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 
-    PRIVATE
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/external/glm
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
+        
 )
 
-# ------------------------
-# GLAD
-# ------------------------
+# glad
+
 add_library(glad STATIC
     external/glad/src/glad.c
 )
@@ -32,28 +31,31 @@ target_include_directories(glad PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
 )
 
-# ------------------------
-# Dependencies
-# ------------------------
+target_precompile_headers(engine PRIVATE
+    <vector>
+    <cstdint>
+    <memory>
+)
+
+
 target_link_libraries(engine
     PUBLIC
         glfw
         glad
+        assimp
 )
 
-# ------------------------
+# compile options
+
+target_compile_options(engine PRIVATE -fdiagnostics-color=always)
+
 # Compiler warnings
-# ------------------------
+
 target_compile_options(engine PRIVATE
     -Wall
     -Wextra
     -Wpedantic
 )
-
-# ------------------------
-# Optional
-# ------------------------
-# target_compile_options(engine PRIVATE -Werror)
 
 # set_target_properties(engine PROPERTIES
 #     CXX_CLANG_TIDY
