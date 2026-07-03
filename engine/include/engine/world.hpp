@@ -4,7 +4,6 @@
 #include "resources/resource_manager.hpp"
 #include "ecs/registry.hpp"
 
-
 constexpr int32_t keyCount = 348; 
 
 struct GLFWwindow;
@@ -43,6 +42,9 @@ struct InputConfig {
 
 struct RenderState {
     Color clearColor;
+
+    uint32_t lightUBO {};
+    uint32_t cameraUBO {};
 };
 
 struct Time {
