@@ -2,6 +2,11 @@
 
 #include "engine/world.hpp"
 
+namespace TextureUnit {
+    constexpr uint32_t diffuseMap = 0;
+    constexpr uint32_t specularMap = 1;
+}
+
 namespace BlockBinding {
     constexpr uint32_t lightBlock = 0;
     constexpr uint32_t cameraBlock = 1;

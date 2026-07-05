@@ -34,11 +34,13 @@ struct Renderable {
 
 struct Material {
     ShaderHandle shaderHandle {};
-    TextureHandle textureHandle {};
+
+    TextureHandle diffuseMap {};
+    TextureHandle specularMap {};
 
     glm::vec4 baseColor {1.0f, 1.0f, 1.0f, 1.0f};
     float specularStrength {};
-    float shine {};
+    float shininess {};
 };
 
 struct Camera {
@@ -65,7 +67,7 @@ struct CameraController {
 
 struct PointLight {
     glm::vec3 color {1.0f, 1.0f, 1.0f};
-    float ambientStrength {};
 
+    float ambientStrength {};
     float radius {};
 };

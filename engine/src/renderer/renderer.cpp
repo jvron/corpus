@@ -76,21 +76,23 @@ void Renderer::beginFrame(World &world) {
 
 void Renderer::renderScene(World &world) {
 
-    for (const auto& [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
+    for (const auto [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
 
         if (!renderable.visible) {
             continue;
         }
 
-        glm::mat4 model = glm::mat4(1.0f);
-
         ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(material.shaderHandle);
 
-        Texture& texture = world.resourceManager.getTexture(material.textureHandle);
-        int textureUnit = 0;
-        GLBackend::bindTextureUnit(texture.id, textureUnit);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uTexture"], textureUnit);
+        const Texture& diffuseMap = world.resourceManager.getTexture(material.diffuseMap);
+        GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::diffuseMap);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::diffuseMap);
 
+        const Texture& specularMap = world.resourceManager.getTexture(material.specularMap);
+        GLBackend::bindTextureUnit(specularMap.id, TextureUnit::specularMap);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::specularMap);
+
+        glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, transform.position);
         model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -102,7 +104,7 @@ void Renderer::renderScene(World &world) {
         
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], material.specularStrength);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShine"], material.shine);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], material.shininess);
     
         GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
