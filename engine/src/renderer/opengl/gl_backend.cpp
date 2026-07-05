@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <cstdint>
 #include <glad/glad.h>
 #include <algorithm>
 #include <cassert>
@@ -111,24 +112,28 @@ GLuint GLBackend::getUniformLocation(ShaderProgram shaderProgram, const std::str
     return glGetUniformLocation(shaderProgram, uniformName.c_str());
 }
 
-void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, const glm::vec4& value) {
     glProgramUniform4fv(shaderProgram, location, 1, glm::value_ptr(value));
 }
 
-void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec3& value) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, const glm::vec3& value) {
     glProgramUniform3fv(shaderProgram, location, 1, glm::value_ptr(value));
 }
 
-void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, const glm::mat4& value) {
     glProgramUniformMatrix4fv(shaderProgram, location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, int value) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, int value) {
     glProgramUniform1i(shaderProgram, location, value);
 }
 
-void GLBackend::setUniform(ShaderProgram shaderProgram, GLuint location, float value) {
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, float value) {
     glProgramUniform1f(shaderProgram, location, value);
+}
+
+void GLBackend::setUniform(ShaderProgram shaderProgram, GLint location, uint32_t value) {
+    glProgramUniform1ui(shaderProgram, location, value);
 }
 
 // UBO

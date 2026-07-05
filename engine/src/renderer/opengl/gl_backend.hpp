@@ -57,11 +57,12 @@ namespace GLBackend {
     void useProgram(GLuint shaderProgram);
 
     GLuint getUniformLocation(ShaderProgram shaderProgram, const std::string& uniformName);
-    void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec4& value);
-    void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::vec3& value);
-    void setUniform(ShaderProgram shaderProgram, GLuint location, const glm::mat4& value);
-    void setUniform(ShaderProgram shaderProgram, GLuint location, int value);
-    void setUniform(ShaderProgram shaderProgram, GLuint location, float value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, const glm::vec4& value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, const glm::vec3& value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, const glm::mat4& value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, float value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, int value);
+    void setUniform(ShaderProgram shaderProgram, GLint location, uint32_t value);
 
     void createUBO(GLuint& ubo, size_t size, GLuint bindingSlot);
     void updateUBO(GLuint& ubo, size_t size, const void* data);
