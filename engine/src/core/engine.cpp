@@ -12,6 +12,19 @@
 #include "platform/window.hpp"
 #include "resources/resource_manager.hpp"
 
+void Engine::registerComponents(World& world) {
+    world.registry.registerComponent<Mesh>();
+    world.registry.registerComponent<Material>();
+    world.registry.registerComponent<Color>();
+    world.registry.registerComponent<Renderable>();
+    world.registry.registerComponent<Transform>();
+    world.registry.registerComponent<Camera>();
+    world.registry.registerComponent<CameraController>();
+    world.registry.registerComponent<PointLight>();
+    world.registry.registerComponent<DirectionalLight>();
+    world.registry.registerComponent<Spotlight>();
+}
+
 void Engine::startUp(World &world) {
 
     Window::create(world);
@@ -21,14 +34,7 @@ void Engine::startUp(World &world) {
 
     scheduler.init(world);
     
-    world.registry.registerComponent<Mesh>();
-    world.registry.registerComponent<Material>();
-    world.registry.registerComponent<Color>();
-    world.registry.registerComponent<Renderable>();
-    world.registry.registerComponent<Transform>();
-    world.registry.registerComponent<Camera>();
-    world.registry.registerComponent<CameraController>();
-    world.registry.registerComponent<PointLight>();
+    registerComponents(world);
 
     scheduler.addSystem(Stage::Begin, Window::pollEvents);
     scheduler.addSystem(Stage::Update, CameraControlSystem::update);
@@ -36,7 +42,6 @@ void Engine::startUp(World &world) {
     scheduler.addSystem(Stage::Render, Renderer::beginFrame);
     scheduler.addSystem(Stage::Render, Renderer::renderScene);
     scheduler.addSystem(Stage::End, Window::swapBuffers);
-
 }
 
 void Engine::run(World &world) {
