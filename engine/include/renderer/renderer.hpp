@@ -2,6 +2,9 @@
 
 #include "engine/world.hpp"
 
+constexpr int MaxPointLights = 32;
+constexpr int MaxSpotlights = 12;
+
 namespace TextureUnit {
     constexpr uint32_t diffuseMap = 0;
     constexpr uint32_t specularMap = 1;
@@ -13,14 +16,50 @@ namespace BlockBinding {
 }
 
 struct GPUPointLight {
-    glm::vec4 color {1.0f};
-    glm::vec4 position {0.0f};
+    glm::vec4 color {};
+    glm::vec4 position {};
+
+    float intensity {};
+    float radius {};
+    char padding1[8];
+
+    float constant {1.0f};
+    float linear {};
+    float quadratic {};
+    char padding2[4];
+};
+
+struct GPUDirectionalLight {
+    glm::vec4 color {};
+    glm::vec4 direction {};
+
+    float ambientStrength {};
+    float intensity {};
+    char padding[8];
+};
+
+struct GPUSpotlight {
+    glm::vec4 color {};
+    glm::vec4 direction {};
+    glm::vec4 position {};
+
+    float intensity {};
+    float radius {};
+    float innerCutOff {};
+    float outerCutOff {};
 };
 
 struct GPULightBlock {
-    int lightCount {};
-    char padding[12];
-    GPUPointLight pointLight[32];
+
+    GPUDirectionalLight dirLight;
+
+    int pointLightCount {};
+    char padding1[12];
+    GPUPointLight pointLights[MaxPointLights];
+
+    int spotlightCount {};
+    char padding2[12];
+    GPUSpotlight spotlights[MaxSpotlights];
 };
 
 struct GPUCameraBlock {

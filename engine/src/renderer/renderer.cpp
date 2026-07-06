@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/trigonometric.hpp>
 
 #include "engine/systems.hpp"
 #include "resources/resource_manager.hpp"
@@ -33,20 +34,59 @@ GPULightBlock Renderer::gatherLightData(World& world) {
     GPULightBlock lightData;
     int count = 0;
 
-    for (const auto& [entity, light, transform] : View<PointLight, Transform>(world.registry)) {
+    for (const auto [entity, light] : View<PointLight>(world.registry)) {
 
-        GPUPointLight pointLight;
-        if (count >= 32) {
+        if (count >= MaxPointLights) {
             break;
         }
+        GPUPointLight pointLight;
 
-        pointLight.color = glm::vec4(light.color, light.ambientStrength);
-        pointLight.position = glm::vec4(transform.position, light.radius);
+        pointLight.color = glm::vec4(light.color, 1.0f);
+        pointLight.position = glm::vec4(light.position, 1.0f);
+        pointLight.intensity = light.intensity;
+        pointLight.radius = light.radius;
 
-        lightData.pointLight[count] = pointLight;
+        lightData.pointLights[count] = pointLight;
         count++;
     }
-    lightData.lightCount = count;
+    lightData.pointLightCount = count;
+
+    count = 0;
+    for (const auto [entity, light] : View<Spotlight>(world.registry)) {
+
+        if (count >= MaxSpotlights) {
+            break;
+        }
+        GPUSpotlight spotlight;
+
+        spotlight.color = glm::vec4(light.color, 1.0f);
+        spotlight.position = glm::vec4(light.position, 1.0f);
+        spotlight.direction = glm::vec4(light.direction, 0.0f);
+        spotlight.intensity = light.intensity;
+        spotlight.radius = light.radius;
+        spotlight.innerCutOff = glm::cos(glm::radians(light.innerCutOff));
+        spotlight.outerCutOff = glm::cos(glm::radians(light.outerCutOff));
+
+        lightData.spotlights[count] = spotlight;
+        count++;
+    }
+    lightData.spotlightCount = count;
+
+    count = 0;
+    GPUDirectionalLight dirLight;
+    for (const auto [entity, light] : View<DirectionalLight>(world.registry)) {
+
+        if (count >= 1) {
+            break;
+        }
+        dirLight.color = glm::vec4(light.color, 1.0f);
+        dirLight.direction = glm::vec4(light.direction, 0.0f);
+        dirLight.intensity = light.intensity;
+        dirLight.ambientStrength = light.ambientStrength;
+        count++;
+    }
+    lightData.dirLight = dirLight;
+    
     return lightData;
 }
 
