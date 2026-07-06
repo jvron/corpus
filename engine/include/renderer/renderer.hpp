@@ -22,11 +22,6 @@ struct GPUPointLight {
     float intensity {};
     float radius {};
     char padding1[8];
-
-    float constant {1.0f};
-    float linear {};
-    float quadratic {};
-    char padding2[4];
 };
 
 struct GPUDirectionalLight {
