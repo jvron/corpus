@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstdio>
 #include <sys/types.h>
 #include <vector>
 
@@ -88,10 +89,27 @@ public:
     }
 
     template <typename ... T>
-    void insertComponents(Entity entity, const T&... components  ) {
+    void insertComponents(Entity entity, const T&... components) {
 
         static_assert(sizeof...(T) > 0, "Must provide atleast one component");
 
         (insert(entity, components), ...);
+    }
+
+    template <typename T> 
+    void remove(Entity entity) {
+
+        assert(getPool<T>() != nullptr && "[ERROR]: Component provided does not exist");
+        uint32_t componentId = getId<T>();
+
+        pools[componentId].remove(entity);
+    };
+
+    template <typename ...T> 
+    void removeComponents(Entity entity) {
+
+        static_assert(sizeof...(T), "Must provide atleast one component");
+
+        (remove<T>(entity), ...);
     }
 };
