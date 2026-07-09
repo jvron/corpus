@@ -1,5 +1,30 @@
-build
-compile_commands.json
-.cache
+# Build directories
+build/
+game
+
+# Build scripts (local)
 build.py
+rebuild.py
+
+# Compilation database
+compile_commands.json
+
+# Cache directories
+.cache/
+
+# Profiling output
+perf.data
+perf.data.old
+
+# Temporary files
 text.txt
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
