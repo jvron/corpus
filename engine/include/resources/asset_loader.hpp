@@ -18,7 +18,8 @@ enum class TexType {
     DiffuseMap,
     SpecularMap,
     Albedo,
-    Metallic
+    Metallic,
+    Unknown
 };
 
 enum class ComponentType {
