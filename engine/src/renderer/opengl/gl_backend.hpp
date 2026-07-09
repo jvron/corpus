@@ -59,6 +59,8 @@ namespace GLBackend {
     GLenum toGLFilter(TexFilter filter);
     GLenum toGLFormat(TexFormat format);
     GLenum toGLInternalFormat(TexFormat format);
+    GLenum toGLType(ComponentType type);
+    GLboolean toGLBoolean(bool value);
 
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 

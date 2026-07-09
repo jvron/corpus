@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <cstdint>
-#include <glad/glad.h>
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -36,11 +35,11 @@ void GLBackend::attachElementBuffer(GLuint vao, GLuint buffer) {
     glVertexArrayElementBuffer(vao, buffer);
 }
 
-void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex,const VertexAttribute& attribute) { 
+void GLBackend::setAttribute(GLuint vao, uint32_t bindingIndex, const VertexAttribute& attribute) { 
 
     glEnableVertexArrayAttrib(vao, attribute.location); // enable attribute layout location slot at specified location 
     // set vertex attribute layout at the location
-    glVertexArrayAttribFormat(vao, attribute.location, attribute.componentCount, attribute.componentType, attribute.normalized, attribute.relativeOffset); 
+    glVertexArrayAttribFormat(vao, attribute.location, attribute.componentCount, toGLType(attribute.type), toGLBoolean(attribute.normalized), attribute.relativeOffset); 
     // read from VBO at binding index n
     glVertexArrayAttribBinding(vao, attribute.location, bindingIndex); 
 }
@@ -220,13 +219,13 @@ GLenum GLBackend::toGLFilter(TexFilter filter) {
 GLenum GLBackend::toGLFormat(TexFormat format) {
 
     switch (format) {
-        case TexFormat::RED:
+        case TexFormat::Red:
             return GL_RED;
-        case TexFormat::RG:
+        case TexFormat::Rg:
             return GL_RG;
-        case TexFormat::RGB:
+        case TexFormat::Rgb:
             return GL_RGB;
-        case TexFormat::RGBA:
+        case TexFormat::Rgba:
             return GL_RGBA;
     }
     assert(false && "[ERROR]: Unsupported texture format");
@@ -236,17 +235,35 @@ GLenum GLBackend::toGLFormat(TexFormat format) {
 GLenum GLBackend::toGLInternalFormat(TexFormat format) {
 
     switch (format) {
-        case TexFormat::RED:
+        case TexFormat::Red:
             return GL_R8;
-        case TexFormat::RG:
+        case TexFormat::Rg:
             return GL_RG8;
-        case TexFormat::RGB:
+        case TexFormat::Rgb:
             return GL_RGB8;
-        case TexFormat::RGBA:
+        case TexFormat::Rgba:
             return GL_RGBA8;
     }
     assert(false && "[ERROR]: Unsupported texture format");
-    return GL_RGBA8;
+    return GL_RGBA8; 
+}
+
+GLenum GLBackend::toGLType(ComponentType type) {
+
+    switch (type) {
+        case ComponentType::Int:
+            return GL_INT;
+        case ComponentType::Float:
+            return GL_FLOAT;
+        case ComponentType::UnsignedInt:
+            return GL_UNSIGNED_INT;
+        case ComponentType::UnsignedByte:
+            return GL_UNSIGNED_BYTE;
+    }
+}
+
+GLboolean GLBackend::toGLBoolean(bool value) {
+    return value ? GL_TRUE : GL_FALSE;
 }
 
 void GLBackend::setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT) {
