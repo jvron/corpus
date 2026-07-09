@@ -7,7 +7,6 @@
 
 #include "ecs/components.hpp"
 #include "asset_loader.hpp"
-#include "renderer/opengl/gl_backend.hpp"
 
 struct World;
 
@@ -16,6 +15,25 @@ using ShaderProgram = uint32_t;
 enum class ShaderType {
     Vertex,
     Fragment,
+};
+
+enum class TexWrap {
+    Repeat,
+    MirroredRepeat,
+    ClampToEdge,
+    ClampToBorder
+};
+
+enum class TexFilter {
+    Linear,
+    Nearest,
+
+    // mipmap filters 
+    NearestMipmapNearest,
+    NearestMipmapLinear,
+
+    LinearMipmapLinear,
+    LinearMipmapNearest
 };
 
 struct MeshAsset {

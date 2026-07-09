@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <GL/gl.h>
+#include <glad/glad.h>
 #include <cstddef>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -9,30 +9,9 @@
 
 #include "ecs/components.hpp"
 #include "resources/asset_loader.hpp"
+#include "resources/resource_manager.hpp"
 
 struct GPUMesh;
-struct VertexAttribute;
-
-using ShaderProgram = uint32_t;
-
-enum class TexWrap {
-    Repeat,
-    MirroredRepeat,
-    ClampToEdge,
-    ClampToBorder
-};
-
-enum class TexFilter {
-    Linear,
-    Nearest,
-
-    // mipmap filters 
-    NearestMipmapNearest,
-    NearestMipmapLinear,
-
-    LinearMipmapLinear,
-    LinearMipmapNearest
-};
 
 namespace GLBackend {
 
@@ -70,14 +49,16 @@ namespace GLBackend {
     void createTexture2D(GLuint& texture);  
     void allocateTexture2D(GLuint texture, TexFormat format, int width, int height);
     void uploadTexture2D(GLuint texture, TexFormat format, int width, int height, void* data);
-    GLenum toGLWrap(TexWrap wrap);
-    GLenum toGLFilter(TexFilter filter);
-    GLenum toGLFormat(TexFormat format);
-    GLenum toGLInternalFormat(TexFormat format);
+
     void setTexture2DWrap(GLuint texture, TexWrap wrapS, TexWrap wrapT);
     void setTexture2DFilter(GLuint texture, TexFilter minFilter, TexFilter magFilter);
     void bindTextureUnit(GLuint texture, GLuint unit);
     void generateMipmap(GLuint texture);
+
+    GLenum toGLWrap(TexWrap wrap);
+    GLenum toGLFilter(TexFilter filter);
+    GLenum toGLFormat(TexFormat format);
+    GLenum toGLInternalFormat(TexFormat format);
 
     void drawIndexed(const GPUMesh& gpuMesh, GLuint shaderProgram);
 
