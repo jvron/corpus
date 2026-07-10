@@ -1,11 +1,13 @@
 #pragma once 
-
+ 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <cstdint>
+#include <vector>
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
+using MaterialHandle = uint32_t;
 using TextureHandle = uint32_t;
 using EntityID = uint32_t;
 
@@ -25,7 +27,7 @@ struct Transform {
 };
 
 struct Mesh {  
-    MeshHandle meshHandle {};
+    MeshHandle handle {};
 };
 
 struct Renderable {
@@ -38,9 +40,18 @@ struct Material {
     TextureHandle diffuseMap {};
     TextureHandle specularMap {};
 
-    glm::vec4 baseColor {1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 baseColor {1.0f};
     float specularStrength {};
     float shininess {};
+};
+
+struct Model {
+    struct Part {
+        MeshHandle meshHandle {};
+        MaterialHandle materialHandle {};
+    };
+
+    std::vector<Part> parts;
 };
 
 struct Camera {

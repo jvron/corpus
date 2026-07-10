@@ -1,4 +1,3 @@
-#include <GLFW/glfw3.h>
 #include <cstdio>
 
 #include "engine/engine.hpp"
@@ -23,6 +22,7 @@ void Engine::registerComponents(World& world) {
     world.registry.registerComponent<PointLight>();
     world.registry.registerComponent<DirectionalLight>();
     world.registry.registerComponent<Spotlight>();
+    world.registry.registerComponent<Model>();
 }
 
 void Engine::startUp(World &world) {
