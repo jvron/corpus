@@ -12,6 +12,7 @@ struct World;
 
 using ShaderProgram = uint32_t;
 
+
 enum class ShaderType {
     Vertex,
     Fragment,
@@ -59,7 +60,7 @@ struct Texture {
     uint32_t id {};
 };
 
-struct Texture2DParam {
+struct Tex2DParameters {
     TexWrap wrapS;
     TexWrap wrapT;
     TexFilter minFilter;
@@ -68,14 +69,29 @@ struct Texture2DParam {
     bool enableMipmap {true};
 };
 
+struct MaterialAsset {
+    ShaderHandle shaderHandle {};
+
+    TextureHandle diffuseMap {};
+    TextureHandle specularMap {};
+
+    glm::vec4 baseColor {1.0f};
+    float specularStrength {};
+    float shininess {};
+};
+
 class ResourceManager {
 
 private:
     std::vector<ShaderProgram> shaderPrograms;
     std::vector<ShaderAsset> shaderAssets;
+
     std::vector<MeshAsset> meshAssets;
+    
     std::vector<Texture> textures;
+    
     std::vector<GPUMesh> gpuMeshes;
+    std::vector<MaterialAsset> materialAssets;
     
 public:
 
@@ -94,7 +110,9 @@ public:
 
     TextureHandle loadTexture(const std::string& texturePath);
     Texture& getTexture(TextureHandle textureHandle);
-    void setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& parameters);
+    void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
+
+    Model loadModel(const std::string& filePath);
 
     void destroy();
 };

@@ -9,9 +9,8 @@
 #include "ecs/components.hpp"
 #include "ecs/view.hpp"
 #include "engine/world.hpp"
-#include "renderer/opengl/gl_backend.hpp"
+#include "renderer/opengl/gl_backend.hpp" 
 #include "resources/asset_loader.hpp"
-
 
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
@@ -86,7 +85,7 @@ Mesh ResourceManager::insertMeshAsset(const MeshAsset &meshAsset) {
     MeshHandle handle = meshAssets.size();
     meshAssets.push_back(meshAsset);
 
-    Mesh mesh = {.meshHandle = handle};
+    Mesh mesh = {.handle = handle};
     return mesh;
 }
 
@@ -108,7 +107,7 @@ void ResourceManager::buildGPUMesh(World& world) {
 
     for (auto [entity, mesh] : View<Mesh>(world.registry)) {
        
-        const MeshAsset& meshAsset = getMeshAsset(mesh.meshHandle);
+        const MeshAsset& meshAsset = getMeshAsset(mesh.handle);
 
         GPUMesh gpuMesh;
         GLBackend::createVertexArray(gpuMesh.vao);
@@ -122,11 +121,11 @@ void ResourceManager::buildGPUMesh(World& world) {
         GLBackend::attachVertexBuffer(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshAsset.vertexLayout.stride);
         GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
 
-        for (const VertexAttribute &attribute : meshAsset.vertexLayout.attributes) {
+        for (const VertexAttribute& attribute : meshAsset.vertexLayout.attributes) {
             GLBackend::setAttribute(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, attribute);
         }
 
-        insertGPUMesh(mesh.meshHandle, gpuMesh);
+        insertGPUMesh(mesh.handle, gpuMesh);
     }
 }
 
@@ -139,14 +138,14 @@ GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
 
 TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
 
-    ImageData imageData = AssetLoader::loadTexture(filePath);
+    ImageData imageData = AssetLoader::loadImage(filePath);
 
     Texture texture;
     GLBackend::createTexture2D(texture.id);
     GLBackend::allocateTexture2D(texture.id, imageData.format, imageData.width, imageData.height);
     GLBackend::uploadTexture2D(texture.id, imageData.format, imageData.width, imageData.height, imageData.data);
 
-    AssetLoader::freeData(imageData.data);
+    AssetLoader::freeImage(imageData.data);
 
     TextureHandle handle = textures.size();
     textures.push_back(texture);
@@ -161,38 +160,113 @@ Texture& ResourceManager::getTexture(TextureHandle textureHandle) {
     return textures[textureHandle]; 
 }
 
-void ResourceManager::setTexture2DParameters(TextureHandle textureHandle, const Texture2DParam& param) {
+void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters) {
 
     Texture& texture = getTexture(textureHandle);
 
-    GLBackend::setTexture2DWrap(texture.id, param.wrapS,  param.wrapT);
+    GLBackend::setTexture2DWrap(texture.id, parameters.wrapS,  parameters.wrapT);
 
 
     auto isMipmapFilter = [](TexFilter f) {
         return f == TexFilter::LinearMipmapLinear ||
-            f == TexFilter::LinearMipmapNearest ||
-            f == TexFilter::NearestMipmapNearest ||
-            f == TexFilter::NearestMipmapLinear;
+               f == TexFilter::LinearMipmapNearest ||
+               f == TexFilter::NearestMipmapNearest ||
+               f == TexFilter::NearestMipmapLinear;
     };
 
-    if (param.enableMipmap) {
+    if (parameters.enableMipmap) {
 
         GLBackend::generateMipmap(texture.id);
 
-        if (!isMipmapFilter(param.minFilter)) {
+        if (!isMipmapFilter(parameters.minFilter)) {
             std::cerr << "[ERROR]: Min filter is not a mipmap filter but mipmaps are enabled \n"; 
             return;
         }
-        GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
+        GLBackend::setTexture2DFilter(texture.id, parameters.minFilter, parameters.magFilter);
     }
     else {
 
-        if (isMipmapFilter(param.minFilter)) {
+        if (isMipmapFilter(parameters.minFilter)) {
             std::cerr << "[ERROR]: Mipmap filter provided but mipmaps are disabled \n"; 
             return;
         }
-        GLBackend::setTexture2DFilter(texture.id, param.minFilter, param.magFilter);
+        GLBackend::setTexture2DFilter(texture.id, parameters.minFilter, parameters.magFilter);
     }
+}
+
+Model ResourceManager::loadModel(const std::string& filePath) {
+    Model model;
+
+    ModelImport import = AssetLoader::loadModel(filePath);
+
+    std::vector<MaterialHandle> materialHandles;
+    materialHandles.reserve( import.materialImports.size());
+
+    for (const auto& materialImport : import.materialImports) {
+
+        MaterialAsset materialAsset;
+
+        for (const auto& textureImport : materialImport.textureImports) {
+    
+            TextureHandle texHandle = loadTexture(textureImport.path);
+    
+            switch (textureImport.type) {
+                case TexType::DiffuseMap:
+                    materialAsset.diffuseMap = texHandle;
+                    break;
+                case TexType::SpecularMap:
+                    materialAsset.specularMap = texHandle;
+                    break;
+                case TexType::Unknown:
+                    std::cerr << "[ERROR]: Unknown texture type provided\n";
+                    break;
+                default:
+                    break;
+            }
+        }
+        MaterialHandle materialHandle = materialAssets.size();
+        materialHandles.push_back(materialHandle);
+
+        materialAssets.push_back(materialAsset);
+    }
+        
+    gpuMeshes.reserve(import.meshImports.size() + gpuMeshes.size());
+
+    for (const auto& meshImport : import.meshImports) {
+
+        const MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
+
+        const MeshData& meshData = meshImport.meshData;
+
+        GPUMesh gpuMesh;
+        GLBackend::createVertexArray(gpuMesh.vao);
+        GLBackend::createBuffer(gpuMesh.vbo);
+        GLBackend::createBuffer(gpuMesh.ebo);
+        gpuMesh.indexCount = meshData.indices.size();
+
+        GLBackend::uploadBuffer(gpuMesh.vbo, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data());
+        GLBackend::uploadBuffer(gpuMesh.ebo, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data());
+
+        GLBackend::attachVertexBuffer(gpuMesh.vao, meshData.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshData.vertexLayout.stride);
+        GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
+
+        for (const VertexAttribute& attribute : meshData.vertexLayout.attributes) {
+            GLBackend::setAttribute(gpuMesh.vao, meshData.vertexLayout.bindingIndex, attribute);
+        }
+
+        const MeshHandle meshHandle = gpuMeshes.size();
+        gpuMeshes.push_back(gpuMesh);
+
+
+        Model::Part part = {
+            .meshHandle = meshHandle,
+            .materialHandle = materialHandle
+        };
+
+        model.parts.emplace_back(part);
+    }
+
+    return model;
 }
 
 void ResourceManager::destroy() {
