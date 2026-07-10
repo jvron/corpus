@@ -1,9 +1,3 @@
-#include "assimp/color4.h"
-#include "assimp/material.h"
-#include "assimp/types.h"
-#include "assimp/vector3.h"
-#include <cmath>
-#include <cstddef>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -242,7 +236,7 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport) {
 
 void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImport) {
 
-    for (unsigned int i = 0; i < node.mNumMeshes; i++) {
+    for (size_t i = 0; i < node.mNumMeshes; i++) {
         const aiMesh* mesh =  scene.mMeshes[node.mMeshes[i]];
 
         MeshImport meshImport = {
@@ -251,9 +245,10 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
         };
         modelImport.meshImports.push_back(meshImport);
     }
+
     //process child nodes
-    for (unsigned int i = 0; i< node.mNumChildren; i++) {
-        processNode(node, scene, modelImport);
+    for (size_t i = 0; i < node.mNumChildren; i++) {
+        processNode(*node.mChildren[i], scene, modelImport);
     }
 }
 
