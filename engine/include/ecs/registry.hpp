@@ -108,7 +108,7 @@ public:
     template <typename ...T> 
     void removeComponents(Entity entity) {
 
-        static_assert(sizeof...(T), "Must provide atleast one component");
+        static_assert(sizeof...(T) > 0, "Must provide atleast one component");
 
         (remove<T>(entity), ...);
     }
