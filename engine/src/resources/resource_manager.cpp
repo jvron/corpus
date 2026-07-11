@@ -272,6 +272,14 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
     return model;
 }
 
+MaterialAsset ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
+    
+    assert(materialHandle < materialAssets.size() && "[ERROR]: MaterialAsset does not exist");
+
+    return materialAssets[materialHandle];
+}
+
+
 void ResourceManager::destroy() {
 
     for (ShaderProgram& program : shaderPrograms) {

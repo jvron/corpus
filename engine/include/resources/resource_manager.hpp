@@ -123,6 +123,7 @@ public:
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
 
     Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
+    MaterialAsset getMaterialAsset(MaterialHandle materialHandle);
 
     void destroy();
 };
