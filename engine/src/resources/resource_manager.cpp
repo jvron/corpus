@@ -73,7 +73,7 @@ void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::s
 
     if (shaderAsset.uniformLocations.find(uniformName) == shaderAsset.uniformLocations.end()) {
         GLuint location = GLBackend::getUniformLocation(shaderAsset.shaderProgram, uniformName);
-        std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
+        //std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
         shaderAsset.uniformLocations[uniformName] = location;
     }
 }
@@ -208,12 +208,12 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
 Model ResourceManager::loadModel(const std::string& filePath) {
     Model model;
 
-    ModelImport import = AssetLoader::loadModel(filePath);
+    ModelImport modelImport = AssetLoader::loadModel(filePath);
 
     std::vector<MaterialHandle> materialHandles;
-    materialHandles.reserve(import.materialImports.size());
+    materialHandles.reserve(modelImport.materialImports.size());
 
-    for (auto& materialImport : import.materialImports) {
+    for (auto& materialImport : modelImport.materialImports) {
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
@@ -245,7 +245,7 @@ Model ResourceManager::loadModel(const std::string& filePath) {
 
     }
 
-    for (const auto& meshImport : import.meshImports) {
+    for (const auto& meshImport : modelImport.meshImports) {
 
         const MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
 
@@ -253,8 +253,8 @@ Model ResourceManager::loadModel(const std::string& filePath) {
     
         const Mesh& mesh = loadMesh(meshData, meshImport.name);
 
-        model.modelName = meshImport.name;
-        
+        model.modelName = modelImport.name;
+
         Model::Part part = {
             .meshHandle = mesh.handle,
             .materialHandle = materialHandle
