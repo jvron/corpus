@@ -139,19 +139,26 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, bool storeMeshData) {
     return mesh;
 };
 
-TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
-
-    ImageData imageData = AssetLoader::loadImage(filePath);
+TextureHandle ResourceManager::createTexture(const ImageData& imageData) {
 
     Texture texture;
     GLBackend::createTexture2D(texture.id);
     GLBackend::allocateTexture2D(texture.id, imageData.format, imageData.width, imageData.height);
     GLBackend::uploadTexture2D(texture.id, imageData.format, imageData.width, imageData.height, imageData.data);
 
-    AssetLoader::freeImage(imageData.data);
-
     TextureHandle handle = textures.size();
     textures.push_back(texture);
+
+    return handle;
+}
+
+TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
+
+    ImageData imageData = AssetLoader::loadImage(filePath);
+
+    TextureHandle handle = createTexture(imageData);
+    
+    AssetLoader::freeImage(imageData.data);
 
     return handle;
 }
@@ -209,8 +216,9 @@ Model ResourceManager::loadModel(const std::string& filePath) {
         MaterialAsset materialAsset;
 
         for (const auto& textureImport : materialImport.textureImports) {
-    
-            TextureHandle texHandle = loadTexture(textureImport.path);
+            
+            TextureHandle texHandle = createTexture(textureImport.imageData);
+            AssetLoader::freeImage(textureImport.imageData.data);
     
             switch (textureImport.type) {
                 case TexType::DiffuseMap:
@@ -245,7 +253,7 @@ Model ResourceManager::loadModel(const std::string& filePath) {
             .materialHandle = materialHandle
         };
 
-        model.parts.emplace_back(part);
+        model.parts.push_back(part);
     }
 
     return model;

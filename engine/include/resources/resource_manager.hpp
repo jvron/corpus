@@ -104,6 +104,7 @@ public:
     GPUMesh buildGPUMesh(const MeshData& meshData);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
+    TextureHandle createTexture(const ImageData& imageData);
     TextureHandle loadTexture(const std::string& texturePath);
     Texture& getTexture(TextureHandle textureHandle);
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
