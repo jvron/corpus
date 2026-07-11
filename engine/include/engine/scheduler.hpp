@@ -1,4 +1,5 @@
 #pragma once 
+
 #include <unordered_map>
 #include <vector>
 
@@ -21,10 +22,12 @@ enum class Stage{
 
 class Scheduler {
 
-    public:
+private:
+    World *worldHandle = nullptr;
+    std::unordered_map<Stage, Schedule> pipeline;
+
+public:
     void init(World &world);
     void runStage(Stage stage);
     void addSystem(Stage stage, systemFn sys);
-    std::unordered_map<Stage, Schedule> pipeline {};
-    World *worldHandle = nullptr;
 };
