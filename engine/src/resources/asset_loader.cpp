@@ -39,7 +39,7 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
     unsigned char* data = stbi_load(filePath.c_str(), &imageData.width, &imageData.height, &channels, 0);
 
     if (data == nullptr) {
-        std::cerr << "[ERROR]: Failed to load texture: " << filePath << "\n";
+        std::cerr << "[ERROR](stb_image): Failed to load texture: " << filePath << "\n";
     }
 
     imageData.data = data;
@@ -58,7 +58,7 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
             imageData.format = TexFormat::Rgba;
             break;
         default:
-            std::cerr << "[ERROR]: Unsupported number of channels: " << channels << "\n";
+            std::cerr << "[ERROR](stb_image): Unsupported number of channels: " << channels <<", for texture: " << filePath <<"\n";
             break;
     }
 
@@ -205,7 +205,7 @@ MeshData processMesh(const aiMesh& mesh) {
     return meshData;
 }
 
-void processTexture(const aiMaterial& material, MaterialImport& materialImport, aiTextureType aiTexType, TexType texType) {
+void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path modelDir, aiTextureType aiTexType, TexType texType) {
 
     size_t textureCount = material.GetTextureCount(aiTexType);
 
@@ -215,18 +215,20 @@ void processTexture(const aiMaterial& material, MaterialImport& materialImport, 
         aiString path;
         material.GetTexture(aiTexType, i, &path);
 
-        ImageData imageData = AssetLoader::loadImage(path.C_Str());
+        std::filesystem::path texturePath = modelDir / path.C_Str();
+
+        ImageData imageData = AssetLoader::loadImage(texturePath.string());
 
         TextureImport textureImport;
         textureImport.imageData = imageData;
         textureImport.type = texType;
-        textureImport.path = path.C_Str();
+        textureImport.path = texturePath;
 
         materialImport.textureImports.push_back(textureImport);
     }
 }
 
-void processMaterials(const aiScene& scene, ModelImport& modelImport) {
+void processMaterials(const aiScene& scene, ModelImport& modelImport, const std::filesystem::path& modelDir) {
 
     modelImport.materialImports.reserve(scene.mNumMaterials);
 
@@ -244,8 +246,8 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport) {
             materialImport.name = "Material_" + std::to_string(i);
         }
 
-        processTexture(*material, materialImport,  aiTextureType_DIFFUSE, TexType::DiffuseMap);
-        processTexture(*material, materialImport, aiTextureType_SPECULAR, TexType::SpecularMap);
+        processTexture(*material, materialImport,  modelDir, aiTextureType_DIFFUSE, TexType::DiffuseMap);
+        processTexture(*material, materialImport, modelDir, aiTextureType_SPECULAR, TexType::SpecularMap);
 
         modelImport.materialImports.push_back(materialImport);
     }
@@ -279,7 +281,7 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
 ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
     constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
-
+    
     ModelImport modelImport;
 
     Assimp::Importer importer;
@@ -294,7 +296,9 @@ ModelImport AssetLoader::loadModel(const std::string& filePath) {
     std::filesystem::path path = filePath;
     modelImport.name = path.stem().string();
 
-    processMaterials(*scene, modelImport);
+    std::filesystem::path modelDir = path.parent_path();
+
+    processMaterials(*scene, modelImport, modelDir);
     processNode(*scene->mRootNode, *scene, modelImport);
 
     return modelImport;
