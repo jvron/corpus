@@ -64,6 +64,7 @@ struct MeshData {
 };
 
 struct MeshImport {
+    std::string name;
     MeshData meshData;
     uint32_t materialIndex {};
 };
@@ -82,10 +83,12 @@ struct TextureImport {
 };
 
 struct MaterialImport {
+    std::string name;
     std::vector<TextureImport> textureImports;
 };
 
 struct ModelImport {
+    std::string name;
     std::vector<MeshImport> meshImports;
     std::vector<MaterialImport> materialImports;
 };

@@ -5,6 +5,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <filesystem>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -232,6 +234,16 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport) {
         const aiMaterial* material = scene.mMaterials[i];
 
         MaterialImport materialImport;
+
+        aiString name = material->GetName();
+
+        if (name.length > 0) {
+            materialImport.name = name.C_Str();
+        }
+        else {
+            materialImport.name = "Material_" + std::to_string(i);
+        }
+
         processTexture(*material, materialImport,  aiTextureType_DIFFUSE, TexType::DiffuseMap);
         processTexture(*material, materialImport, aiTextureType_SPECULAR, TexType::SpecularMap);
 
@@ -244,7 +256,14 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
     for (size_t i = 0; i < node.mNumMeshes; i++) {
         const aiMesh* mesh =  scene.mMeshes[node.mMeshes[i]];
 
+        std::string name = mesh->mName.C_Str();
+
+        if (name.empty()) {
+            name = "Mesh_" + std::to_string(modelImport.meshImports.size());
+        } 
+
         MeshImport meshImport = {
+            .name = name,
             .meshData = processMesh(*mesh), 
             .materialIndex = mesh->mMaterialIndex
         };
@@ -271,6 +290,9 @@ ModelImport AssetLoader::loadModel(const std::string& filePath) {
         std::cerr << "[ERROR](Assimp): " << importer.GetErrorString() << "\n";
         return modelImport;
     }
+
+    std::filesystem::path path = filePath;
+    modelImport.name = path.stem().string();
 
     processMaterials(*scene, modelImport);
     processNode(*scene->mRootNode, *scene, modelImport);
