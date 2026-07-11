@@ -158,7 +158,7 @@ TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
 
     TextureHandle handle = createTexture(imageData);
     
-    AssetLoader::freeImage(imageData.data);
+    AssetLoader::freeImage(imageData);
 
     return handle;
 }
@@ -206,20 +206,19 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
 Model ResourceManager::loadModel(const std::string& filePath) {
     Model model;
 
-    const ModelImport& import = AssetLoader::loadModel(filePath);
+    ModelImport import = AssetLoader::loadModel(filePath);
 
     std::vector<MaterialHandle> materialHandles;
     materialHandles.reserve(import.materialImports.size());
 
-    for (const auto& materialImport : import.materialImports) {
+    for (auto& materialImport : import.materialImports) {
 
         MaterialAsset materialAsset;
 
-        for (const auto& textureImport : materialImport.textureImports) {
+        for (auto& textureImport : materialImport.textureImports) {
             
             TextureHandle texHandle = createTexture(textureImport.imageData);
-            AssetLoader::freeImage(textureImport.imageData.data);
-    
+            
             switch (textureImport.type) {
                 case TexType::DiffuseMap:
                     materialAsset.diffuseMap = texHandle;
@@ -233,7 +232,10 @@ Model ResourceManager::loadModel(const std::string& filePath) {
                 default:
                     break;
             }
+
+            AssetLoader::freeImage(textureImport.imageData);
         }
+        
         const MaterialHandle materialHandle = materialAssets.size();
         materialAssets.push_back(materialAsset);
         materialHandles.push_back(materialHandle);

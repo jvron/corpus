@@ -94,7 +94,7 @@ namespace AssetLoader  {
 
     std::string readFile(const std::string& filePath);
     ImageData loadImage(const std::string& filePath);
-    void freeImage(void* data);
+    void freeImage(ImageData& imageData);
 
     ModelImport loadModel(const std::string& filePath);
 }

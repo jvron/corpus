@@ -63,8 +63,13 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
     return imageData;
 } 
 
-void AssetLoader::freeImage(void* data) {
-    stbi_image_free(data);
+void AssetLoader::freeImage(ImageData& imageData) {
+    
+    if (imageData.data) {
+
+        stbi_image_free(imageData.data);
+        imageData.data = nullptr;
+    }
 }
 
 void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal) {
