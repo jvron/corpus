@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -11,7 +12,6 @@
 struct World;
 
 using ShaderProgram = uint32_t;
-
 
 enum class ShaderType {
     Vertex,
@@ -37,18 +37,17 @@ enum class TexFilter {
     LinearMipmapNearest
 };
 
-struct MeshAsset {
-    std::vector<Vertex> vertices {};
-    std::vector<uint32_t> indices {};
-    VertexLayout vertexLayout;
-};
-
 struct GPUMesh {
     uint32_t vao {};
     uint32_t vbo {};
     uint32_t ebo {};
-
+    
     uint32_t indexCount {};
+};
+
+struct MeshAsset {
+    std::optional<MeshData> meshData;
+    GPUMesh gpuMesh;
 };
 
 struct ShaderAsset {
@@ -85,12 +84,9 @@ class ResourceManager {
 private:
     std::vector<ShaderProgram> shaderPrograms;
     std::vector<ShaderAsset> shaderAssets;
+    std::vector<Texture> textures;
 
     std::vector<MeshAsset> meshAssets;
-    
-    std::vector<Texture> textures;
-    
-    std::vector<GPUMesh> gpuMeshes;
     std::vector<MaterialAsset> materialAssets;
     
 public:
@@ -101,11 +97,11 @@ public:
     ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
     void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);
 
-    Mesh insertMeshAsset(const MeshAsset& meshAsset);
+    Mesh loadMesh(const MeshData& meshData, bool storeMeshData = false);
+    void insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 
-    void insertGPUMesh(MeshHandle meshHandle, const GPUMesh& gpuMesh);
-    void buildGPUMesh(World& world);
+    GPUMesh buildGPUMesh(const MeshData& meshData);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
     TextureHandle loadTexture(const std::string& texturePath);

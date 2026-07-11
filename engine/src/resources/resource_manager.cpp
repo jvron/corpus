@@ -7,8 +7,6 @@
 
 #include "resources/resource_manager.hpp"
 #include "ecs/components.hpp"
-#include "ecs/view.hpp"
-#include "engine/world.hpp"
 #include "renderer/opengl/gl_backend.hpp" 
 #include "resources/asset_loader.hpp"
 
@@ -80,13 +78,12 @@ void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::s
     }
 }
 
-Mesh ResourceManager::insertMeshAsset(const MeshAsset &meshAsset) {
+void ResourceManager::insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset) {
 
-    MeshHandle handle = meshAssets.size();
-    meshAssets.push_back(meshAsset);
-
-    Mesh mesh = {.handle = handle};
-    return mesh;
+    if (meshHandle >= meshAssets.size()) {
+        meshAssets.resize(meshAssets.size() + 1);
+    }
+    meshAssets[meshHandle] = meshAsset;
 }
 
 MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
@@ -95,46 +92,52 @@ MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
     return meshAssets[meshHandle];
 }   
 
-void ResourceManager::insertGPUMesh(MeshHandle meshHandle, const GPUMesh &gpuMesh) {
+GPUMesh ResourceManager::buildGPUMesh(const MeshData& meshData) {
 
-    if (meshHandle >= gpuMeshes.size()) {
-        gpuMeshes.resize(gpuMeshes.size() + 1);
+    GPUMesh gpuMesh;
+    GLBackend::createVertexArray(gpuMesh.vao);
+    GLBackend::createBuffer(gpuMesh.vbo);
+    GLBackend::createBuffer(gpuMesh.ebo);
+    gpuMesh.indexCount = meshData.indices.size();
+
+    GLBackend::uploadBuffer(gpuMesh.vbo, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data());
+    GLBackend::uploadBuffer(gpuMesh.ebo, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data());
+
+    GLBackend::attachVertexBuffer(gpuMesh.vao, meshData.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshData.vertexLayout.stride);
+    GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
+
+    for (const VertexAttribute& attribute : meshData.vertexLayout.attributes) {
+        GLBackend::setAttribute(gpuMesh.vao, meshData.vertexLayout.bindingIndex, attribute);
     }
-    gpuMeshes[meshHandle] = gpuMesh;
-}
 
-void ResourceManager::buildGPUMesh(World& world) {
-
-    for (auto [entity, mesh] : View<Mesh>(world.registry)) {
-       
-        const MeshAsset& meshAsset = getMeshAsset(mesh.handle);
-
-        GPUMesh gpuMesh;
-        GLBackend::createVertexArray(gpuMesh.vao);
-        GLBackend::createBuffer(gpuMesh.vbo);
-        GLBackend::createBuffer(gpuMesh.ebo);
-        gpuMesh.indexCount = meshAsset.indices.size();
-
-        GLBackend::uploadBuffer(gpuMesh.vbo, meshAsset.vertices.size() * sizeof(Vertex), meshAsset.vertices.data());
-        GLBackend::uploadBuffer(gpuMesh.ebo, meshAsset.indices.size() * sizeof(uint32_t), meshAsset.indices.data());
-
-        GLBackend::attachVertexBuffer(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshAsset.vertexLayout.stride);
-        GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
-
-        for (const VertexAttribute& attribute : meshAsset.vertexLayout.attributes) {
-            GLBackend::setAttribute(gpuMesh.vao, meshAsset.vertexLayout.bindingIndex, attribute);
-        }
-
-        insertGPUMesh(mesh.handle, gpuMesh);
-    }
+    return gpuMesh;
 }
 
 GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
 
-    assert(!(meshHandle >= gpuMeshes.size()) && "Error: GPUMesh does not exist");
+    assert(!(meshHandle >= meshAssets.size()) && "Error: GPUMesh does not exist");
 
-    return gpuMeshes[meshHandle]; 
+    return meshAssets[meshHandle].gpuMesh; 
 }
+
+Mesh ResourceManager::loadMesh(const MeshData& meshData, bool storeMeshData) {
+
+    MeshAsset meshAsset; 
+    meshAsset.gpuMesh = buildGPUMesh(meshData);
+
+    if (storeMeshData) {
+        meshAsset.meshData = meshData;
+    }
+
+    const MeshHandle meshHandle = meshAssets.size();
+    meshAssets.push_back(meshAsset);
+
+    Mesh mesh = {
+        .handle = meshHandle
+    };
+
+    return mesh;
+};
 
 TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
 
@@ -166,7 +169,6 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
 
     GLBackend::setTexture2DWrap(texture.id, parameters.wrapS,  parameters.wrapT);
 
-
     auto isMipmapFilter = [](TexFilter f) {
         return f == TexFilter::LinearMipmapLinear ||
                f == TexFilter::LinearMipmapNearest ||
@@ -197,10 +199,10 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
 Model ResourceManager::loadModel(const std::string& filePath) {
     Model model;
 
-    ModelImport import = AssetLoader::loadModel(filePath);
+    const ModelImport& import = AssetLoader::loadModel(filePath);
 
     std::vector<MaterialHandle> materialHandles;
-    materialHandles.reserve( import.materialImports.size());
+    materialHandles.reserve(import.materialImports.size());
 
     for (const auto& materialImport : import.materialImports) {
 
@@ -224,42 +226,22 @@ Model ResourceManager::loadModel(const std::string& filePath) {
                     break;
             }
         }
-        MaterialHandle materialHandle = materialAssets.size();
+        const MaterialHandle materialHandle = materialAssets.size();
+        materialAssets.push_back(materialAsset);
         materialHandles.push_back(materialHandle);
 
-        materialAssets.push_back(materialAsset);
     }
-        
-    gpuMeshes.reserve(import.meshImports.size() + gpuMeshes.size());
 
     for (const auto& meshImport : import.meshImports) {
 
         const MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
 
         const MeshData& meshData = meshImport.meshData;
-
-        GPUMesh gpuMesh;
-        GLBackend::createVertexArray(gpuMesh.vao);
-        GLBackend::createBuffer(gpuMesh.vbo);
-        GLBackend::createBuffer(gpuMesh.ebo);
-        gpuMesh.indexCount = meshData.indices.size();
-
-        GLBackend::uploadBuffer(gpuMesh.vbo, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data());
-        GLBackend::uploadBuffer(gpuMesh.ebo, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data());
-
-        GLBackend::attachVertexBuffer(gpuMesh.vao, meshData.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshData.vertexLayout.stride);
-        GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
-
-        for (const VertexAttribute& attribute : meshData.vertexLayout.attributes) {
-            GLBackend::setAttribute(gpuMesh.vao, meshData.vertexLayout.bindingIndex, attribute);
-        }
-
-        const MeshHandle meshHandle = gpuMeshes.size();
-        gpuMeshes.push_back(gpuMesh);
-
+    
+        const Mesh mesh = loadMesh(meshData);
 
         Model::Part part = {
-            .meshHandle = meshHandle,
+            .meshHandle = mesh.handle,
             .materialHandle = materialHandle
         };
 
@@ -275,8 +257,8 @@ void ResourceManager::destroy() {
         GLBackend::deleteShaderProgram(program);
     }
 
-    for (GPUMesh& gpuMesh : gpuMeshes) {
-        GLBackend::destroyMesh(gpuMesh);
+    for (MeshAsset& meshAsset  : meshAssets) {
+        GLBackend::destroyMesh(meshAsset.gpuMesh);
     }
 
     for (Texture& texture : textures) {
@@ -287,5 +269,4 @@ void ResourceManager::destroy() {
     shaderAssets.clear();
     textures.clear();
     meshAssets.clear();
-    gpuMeshes.clear();
 }
