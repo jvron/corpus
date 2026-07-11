@@ -46,6 +46,7 @@ struct GPUMesh {
 };
 
 struct MeshAsset {
+    std::string name;
     std::optional<MeshData> meshData;
     GPUMesh gpuMesh;
 };
@@ -69,6 +70,8 @@ struct Tex2DParameters {
 };
 
 struct MaterialAsset {
+    std::string name;
+
     ShaderHandle shaderHandle {};
 
     TextureHandle diffuseMap {};
@@ -97,7 +100,7 @@ public:
     ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
     void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);
 
-    Mesh loadMesh(const MeshData& meshData, bool storeMeshData = false);
+    Mesh loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData = false);
     void insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 

@@ -120,9 +120,10 @@ GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
     return meshAssets[meshHandle].gpuMesh; 
 }
 
-Mesh ResourceManager::loadMesh(const MeshData& meshData, bool storeMeshData) {
+Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData) {
 
     MeshAsset meshAsset; 
+    meshAsset.name = meshName;
     meshAsset.gpuMesh = buildGPUMesh(meshData);
 
     if (storeMeshData) {
@@ -133,6 +134,7 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, bool storeMeshData) {
     meshAssets.push_back(meshAsset);
 
     Mesh mesh = {
+        .name = meshName,
         .handle = meshHandle
     };
 
@@ -214,6 +216,7 @@ Model ResourceManager::loadModel(const std::string& filePath) {
     for (auto& materialImport : import.materialImports) {
 
         MaterialAsset materialAsset;
+        materialAsset.name = materialImport.name;
 
         for (auto& textureImport : materialImport.textureImports) {
             
@@ -235,7 +238,7 @@ Model ResourceManager::loadModel(const std::string& filePath) {
 
             AssetLoader::freeImage(textureImport.imageData);
         }
-        
+
         const MaterialHandle materialHandle = materialAssets.size();
         materialAssets.push_back(materialAsset);
         materialHandles.push_back(materialHandle);
@@ -248,8 +251,10 @@ Model ResourceManager::loadModel(const std::string& filePath) {
 
         const MeshData& meshData = meshImport.meshData;
     
-        const Mesh mesh = loadMesh(meshData);
+        const Mesh& mesh = loadMesh(meshData, meshImport.name);
 
+        model.modelName = meshImport.name;
+        
         Model::Part part = {
             .meshHandle = mesh.handle,
             .materialHandle = materialHandle

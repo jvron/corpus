@@ -4,6 +4,7 @@
 #include <glm/vec4.hpp>
 #include <cstdint>
 #include <vector>
+#include <string>
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
@@ -27,6 +28,7 @@ struct Transform {
 };
 
 struct Mesh {  
+    std::string name;
     MeshHandle handle {};
 };
 
@@ -46,6 +48,8 @@ struct Material {
 };
 
 struct Model {
+    std::string modelName;
+
     struct Part {
         MeshHandle meshHandle {};
         MaterialHandle materialHandle {};
