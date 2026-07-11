@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 
 #include "ecs/sparse_set.hpp"
 #include "ecs/components.hpp"
@@ -11,19 +10,16 @@ size_t SparseSet::size() const {
 }
 
 bool SparseSet::hasEntity(Entity entity) const {
-    //std::cerr << "[DEBUG]: Checking Entity ID: " << entity.id << "\n";
-    int denseIndex = sparse[entity.id];
-   
-    if (denseIndex >= (int)denseEntities.size() || denseIndex < 0) {
+
+    if (entity.id >= maxEntities) {
         return false;
     }
 
-    if (denseEntities[denseIndex].id == entity.id) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    int denseIndex = sparse[entity.id];
+
+    return  denseIndex >= 0 &&
+            denseIndex < (int)denseEntities.size() && 
+            denseEntities[denseIndex].id == entity.id;
 }
 
 void SparseSet::write(Entity entity, const void* componentSourceBytes) {
