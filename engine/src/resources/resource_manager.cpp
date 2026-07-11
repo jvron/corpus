@@ -205,8 +205,7 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
     }
 }
 
-Model ResourceManager::loadModel(const std::string& filePath) {
-    Model model;
+Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions& modelOptions) {
 
     ModelImport modelImport = AssetLoader::loadModel(filePath);
 
@@ -217,22 +216,28 @@ Model ResourceManager::loadModel(const std::string& filePath) {
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
+        materialAsset.shaderHandle = modelOptions.defaultShader;
 
         for (auto& textureImport : materialImport.textureImports) {
             
+            if (textureImport.type == TexType::Unknown) {
+                std::cerr << "[ERROR]: Unknown texture type provided\n";
+                break;
+            }
+
             TextureHandle texHandle = createTexture(textureImport.imageData);
             
             switch (textureImport.type) {
                 case TexType::DiffuseMap:
+                    setTex2DParameters(texHandle, modelOptions.diffuseParameters);
                     materialAsset.diffuseMap = texHandle;
                     break;
                 case TexType::SpecularMap:
+                    setTex2DParameters(texHandle, modelOptions.specularParameters);
                     materialAsset.specularMap = texHandle;
                     break;
-                case TexType::Unknown:
-                    std::cerr << "[ERROR]: Unknown texture type provided\n";
-                    break;
                 default:
+                    std::cerr << "[ERROR]: Unknown texture type provided\n";
                     break;
             }
 
@@ -242,8 +247,9 @@ Model ResourceManager::loadModel(const std::string& filePath) {
         const MaterialHandle materialHandle = materialAssets.size();
         materialAssets.push_back(materialAsset);
         materialHandles.push_back(materialHandle);
-
     }
+        
+    Model model;
 
     for (const auto& meshImport : modelImport.meshImports) {
 
@@ -251,7 +257,7 @@ Model ResourceManager::loadModel(const std::string& filePath) {
 
         const MeshData& meshData = meshImport.meshData;
     
-        const Mesh& mesh = loadMesh(meshData, meshImport.name);
+        const Mesh& mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
 
         model.modelName = modelImport.name;
 

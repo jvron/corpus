@@ -82,6 +82,16 @@ struct MaterialAsset {
     float shininess {};
 };
 
+struct ModelOptions {
+
+    bool storeMeshData {false};
+
+    ShaderHandle defaultShader {};
+
+    Tex2DParameters diffuseParameters;
+    Tex2DParameters specularParameters;
+};
+
 class ResourceManager {
 
 private:
@@ -112,7 +122,7 @@ public:
     Texture& getTexture(TextureHandle textureHandle);
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
 
-    Model loadModel(const std::string& filePath);
+    Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
 
     void destroy();
 };
