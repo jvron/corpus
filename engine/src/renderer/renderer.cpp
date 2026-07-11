@@ -103,18 +103,20 @@ GPUCameraBlock Renderer::gatherCameraData(World &world) {
     return cameraData;
 }
 
-void Renderer::beginFrame(World &world) {
-    
-    GLBackend::clearBuffer(world.engineState.renderState.clearColor);
+glm::mat4 Renderer::getModelMatrix(const Transform& transform) {
 
-    GPULightBlock lightData = gatherLightData(world);
-    GLBackend::updateUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), &lightData);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, transform.position);
+    model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, transform.scale);
+    //Model = T * R * S 
 
-    GPUCameraBlock cameraData = gatherCameraData(world);
-    GLBackend::updateUBO(world.engineState.renderState.cameraUBO, sizeof(GPUCameraBlock), &cameraData);
+    return model;
 }
 
-void Renderer::renderScene(World &world) {
+void Renderer::drawMesh(World& world) {
 
     for (const auto [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
 
@@ -132,21 +134,31 @@ void Renderer::renderScene(World &world) {
         GLBackend::bindTextureUnit(specularMap.id, TextureUnit::specularMap);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::specularMap);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, transform.position);
-        model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::scale(model, transform.scale);
-        //Model = T * R * S
+        glm::mat4 modelMatrix = getModelMatrix(transform);
         
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], model);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
         
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], material.specularStrength);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], material.shininess);
     
-        GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.meshHandle);
+        GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.handle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
     }
+}
+
+void Renderer::beginFrame(World &world) {
+    
+    GLBackend::clearBuffer(world.engineState.renderState.clearColor);
+
+    GPULightBlock lightData = gatherLightData(world);
+    GLBackend::updateUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), &lightData);
+
+    GPUCameraBlock cameraData = gatherCameraData(world);
+    GLBackend::updateUBO(world.engineState.renderState.cameraUBO, sizeof(GPUCameraBlock), &cameraData);
+}
+
+void Renderer::renderScene(World &world) {
+    
+    drawMesh(world);
 }

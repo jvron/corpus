@@ -1,6 +1,10 @@
 #pragma once
 
+#include <glm/ext/matrix_float4x4.hpp>
+
+#include "ecs/components.hpp"
 #include "engine/world.hpp"
+#include "resources/resource_manager.hpp"
 
 constexpr int MaxPointLights = 32;
 constexpr int MaxSpotlights = 12;
@@ -64,11 +68,20 @@ struct GPUCameraBlock {
     glm::mat4 projection {1.0f};
 };
 
+struct RenderData {
+    MeshAsset meshAsset;
+    MaterialAsset materialAsset;
+};
+
 namespace Renderer {
     void init(World& world);
 
     GPULightBlock gatherLightData(World& world);
     GPUCameraBlock gatherCameraData(World& world);
+
+    glm::mat4 getModelMatrix(const Transform& transform);
+
+    void drawMesh(World& world);
 
     void beginFrame(World& world);
     void renderScene(World& world);
