@@ -68,11 +68,6 @@ struct GPUCameraBlock {
     glm::mat4 projection {1.0f};
 };
 
-struct RenderData {
-    MeshAsset meshAsset;
-    MaterialAsset materialAsset;
-};
-
 namespace Renderer {
     void init(World& world);
 
@@ -82,6 +77,7 @@ namespace Renderer {
     glm::mat4 getModelMatrix(const Transform& transform);
 
     void drawMesh(World& world);
+    void drawModel(World& world);
 
     void beginFrame(World& world);
     void renderScene(World& world);
