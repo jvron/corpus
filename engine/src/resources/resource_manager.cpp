@@ -174,7 +174,7 @@ Texture& ResourceManager::getTexture(TextureHandle textureHandle) {
 
 void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters) {
 
-    Texture& texture = getTexture(textureHandle);
+    const Texture& texture = getTexture(textureHandle);
 
     GLBackend::setTexture2DWrap(texture.id, parameters.wrapS,  parameters.wrapT);
 
@@ -216,13 +216,15 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
-        materialAsset.shaderHandle = modelOptions.defaultShader;
+        materialAsset.shaderHandle = modelOptions.shader;
+        materialAsset.shininess = modelOptions.materialShininess;
+        materialAsset.specularStrength = modelOptions.materialSpecularStrength;
 
         for (auto& textureImport : materialImport.textureImports) {
             
             if (textureImport.type == TexType::Unknown) {
                 std::cerr << "[ERROR]: Unknown texture type provided\n";
-                break;
+                continue;;
             }
 
             TextureHandle texHandle = createTexture(textureImport.imageData);
@@ -250,6 +252,7 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
     }
         
     Model model;
+    model.modelName = modelImport.name;
 
     for (const auto& meshImport : modelImport.meshImports) {
 
@@ -257,9 +260,7 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
 
         const MeshData& meshData = meshImport.meshData;
     
-        const Mesh& mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
-
-        model.modelName = modelImport.name;
+        const Mesh mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
 
         Model::Part part = {
             .meshHandle = mesh.handle,
@@ -272,7 +273,7 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
     return model;
 }
 
-MaterialAsset ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
+MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
     
     assert(materialHandle < materialAssets.size() && "[ERROR]: MaterialAsset does not exist");
 
