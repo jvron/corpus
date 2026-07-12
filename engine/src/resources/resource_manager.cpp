@@ -161,14 +161,6 @@ MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) 
     return materialAssets[materialHandle];
 }
 
-void ResourceManager::insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset) {
-
-    if (meshHandle >= meshAssets.size()) {
-        meshAssets.resize(meshAssets.size() + 1);
-    }
-    meshAssets[meshHandle] = meshAsset;
-}
-
 MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
 
     assert(!(meshHandle >= meshAssets.size()) && "Error: MeshAsset does not exist");
@@ -310,4 +302,5 @@ void ResourceManager::destroy() {
     shaderAssets.clear();
     textures.clear();
     meshAssets.clear();
+    materialAssets.clear();
 }

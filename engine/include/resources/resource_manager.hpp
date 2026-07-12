@@ -121,7 +121,6 @@ public:
     Material loadMaterial(const MaterialAsset& materialAsset);
     MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
 
-    void insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 
     GPUMesh buildGPUMesh(const MeshData& meshData);
