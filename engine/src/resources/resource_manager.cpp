@@ -78,69 +78,6 @@ void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::s
     }
 }
 
-void ResourceManager::insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset) {
-
-    if (meshHandle >= meshAssets.size()) {
-        meshAssets.resize(meshAssets.size() + 1);
-    }
-    meshAssets[meshHandle] = meshAsset;
-}
-
-MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
-
-    assert(!(meshHandle >= meshAssets.size()) && "Error: MeshAsset does not exist");
-    return meshAssets[meshHandle];
-}   
-
-GPUMesh ResourceManager::buildGPUMesh(const MeshData& meshData) {
-
-    GPUMesh gpuMesh;
-    GLBackend::createVertexArray(gpuMesh.vao);
-    GLBackend::createBuffer(gpuMesh.vbo);
-    GLBackend::createBuffer(gpuMesh.ebo);
-    gpuMesh.indexCount = meshData.indices.size();
-
-    GLBackend::uploadBuffer(gpuMesh.vbo, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data());
-    GLBackend::uploadBuffer(gpuMesh.ebo, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data());
-
-    GLBackend::attachVertexBuffer(gpuMesh.vao, meshData.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshData.vertexLayout.stride);
-    GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
-
-    for (const VertexAttribute& attribute : meshData.vertexLayout.attributes) {
-        GLBackend::setAttribute(gpuMesh.vao, meshData.vertexLayout.bindingIndex, attribute);
-    }
-
-    return gpuMesh;
-}
-
-GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
-
-    assert(!(meshHandle >= meshAssets.size()) && "Error: GPUMesh does not exist");
-
-    return meshAssets[meshHandle].gpuMesh; 
-}
-
-Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData) {
-
-    MeshAsset meshAsset; 
-    meshAsset.name = meshName;
-    meshAsset.gpuMesh = buildGPUMesh(meshData);
-
-    if (storeMeshData) {
-        meshAsset.meshData = meshData;
-    }
-
-    const MeshHandle meshHandle = meshAssets.size();
-    meshAssets.push_back(meshAsset);
-
-    Mesh mesh = {
-        .name = meshName,
-        .handle = meshHandle
-    };
-
-    return mesh;
-};
-
 TextureHandle ResourceManager::createTexture(const ImageData& imageData) {
 
     Texture texture;
@@ -203,6 +140,88 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
         }
         GLBackend::setTexture2DFilter(texture.id, parameters.minFilter, parameters.magFilter);
     }
+}
+
+Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
+
+    MaterialHandle handle = materialAssets.size();
+    materialAssets.push_back(materialAsset);
+
+    Material material = {
+        .handle = handle
+    };
+
+    return material;
+}
+
+MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
+    
+    assert(materialHandle < materialAssets.size() && "[ERROR]: MaterialAsset does not exist");
+
+    return materialAssets[materialHandle];
+}
+
+void ResourceManager::insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset) {
+
+    if (meshHandle >= meshAssets.size()) {
+        meshAssets.resize(meshAssets.size() + 1);
+    }
+    meshAssets[meshHandle] = meshAsset;
+}
+
+MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
+
+    assert(!(meshHandle >= meshAssets.size()) && "Error: MeshAsset does not exist");
+    return meshAssets[meshHandle];
+}   
+
+GPUMesh ResourceManager::buildGPUMesh(const MeshData& meshData) {
+
+    GPUMesh gpuMesh;
+    GLBackend::createVertexArray(gpuMesh.vao);
+    GLBackend::createBuffer(gpuMesh.vbo);
+    GLBackend::createBuffer(gpuMesh.ebo);
+    gpuMesh.indexCount = meshData.indices.size();
+
+    GLBackend::uploadBuffer(gpuMesh.vbo, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data());
+    GLBackend::uploadBuffer(gpuMesh.ebo, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data());
+
+    GLBackend::attachVertexBuffer(gpuMesh.vao, meshData.vertexLayout.bindingIndex, gpuMesh.vbo, 0, meshData.vertexLayout.stride);
+    GLBackend::attachElementBuffer(gpuMesh.vao, gpuMesh.ebo);
+
+    for (const VertexAttribute& attribute : meshData.vertexLayout.attributes) {
+        GLBackend::setAttribute(gpuMesh.vao, meshData.vertexLayout.bindingIndex, attribute);
+    }
+
+    return gpuMesh;
+}
+
+GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
+
+    assert(!(meshHandle >= meshAssets.size()) && "Error: GPUMesh does not exist");
+
+    return meshAssets[meshHandle].gpuMesh; 
+}
+
+Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData) {
+
+    MeshAsset meshAsset; 
+    meshAsset.name = meshName;
+    meshAsset.gpuMesh = buildGPUMesh(meshData);
+
+    if (storeMeshData) {
+        meshAsset.meshData = meshData;
+    }
+
+    const MeshHandle meshHandle = meshAssets.size();
+    meshAssets.push_back(meshAsset);
+
+    Mesh mesh = {
+        .name = meshName,
+        .handle = meshHandle
+    };
+
+    return mesh;
 }
 
 Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions& modelOptions) {
@@ -272,26 +291,6 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
 
     return model;
 }
-
-Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
-
-    MaterialHandle handle = materialAssets.size();
-    materialAssets.push_back(materialAsset);
-
-    Material material = {
-        .handle = handle
-    };
-
-    return material;
-}
-
-MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
-    
-    assert(materialHandle < materialAssets.size() && "[ERROR]: MaterialAsset does not exist");
-
-    return materialAssets[materialHandle];
-}
-
 
 void ResourceManager::destroy() {
 

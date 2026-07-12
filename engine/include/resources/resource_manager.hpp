@@ -113,22 +113,22 @@ public:
     ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
     void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);
 
-    Mesh loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData = false);
+    TextureHandle createTexture(const ImageData& imageData);
+    TextureHandle loadTexture(const std::string& texturePath);
+    Texture& getTexture(TextureHandle textureHandle);
+    void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
+
+    Material loadMaterial(const MaterialAsset& materialAsset);
+    MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
+
     void insertMeshAsset(MeshHandle meshHandle, const MeshAsset& meshAsset);
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
 
     GPUMesh buildGPUMesh(const MeshData& meshData);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
-    TextureHandle createTexture(const ImageData& imageData);
-    TextureHandle loadTexture(const std::string& texturePath);
-    Texture& getTexture(TextureHandle textureHandle);
-    void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
-
+    Mesh loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData = false);
     Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
-
-    Material loadMaterial(const MaterialAsset& materialAsset);
-    MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
 
     void destroy();
 };
