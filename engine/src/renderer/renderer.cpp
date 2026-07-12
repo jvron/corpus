@@ -76,7 +76,7 @@ GPULightBlock Renderer::gatherLightData(World& world) {
     GPUDirectionalLight dirLight;
     for (const auto [entity, light] : View<DirectionalLight>(world.registry)) {
 
-        if (count >= 1) {
+        if (count >= MaxDirectionalLights) {
             break;
         }
         dirLight.color = glm::vec4(light.color, 1.0f);
@@ -111,6 +111,7 @@ glm::mat4 Renderer::getModelMatrix(const Transform& transform) {
     model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, transform.scale);
+
     //Model = T * R * S 
 
     return model;
@@ -124,23 +125,25 @@ void Renderer::drawMesh(World& world) {
             continue;
         }
 
-        ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(material.shaderHandle);
+        const MaterialAsset& materialAsset = world.resourceManager.getMaterialAsset(material.handle);
 
-        const Texture& diffuseMap = world.resourceManager.getTexture(material.diffuseMap);
+        ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(materialAsset.shaderHandle);
+
+        const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
         GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::diffuseMap);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::diffuseMap);
 
-        const Texture& specularMap = world.resourceManager.getTexture(material.specularMap);
+        const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
         GLBackend::bindTextureUnit(specularMap.id, TextureUnit::specularMap);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::specularMap);
 
         glm::mat4 modelMatrix = getModelMatrix(transform);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
         
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], material.baseColor);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], material.specularStrength);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], material.shininess);
-    
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], materialAsset.baseColor);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], materialAsset.specularStrength);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], materialAsset.shininess);
+
         const GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.handle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
     }
@@ -157,6 +160,7 @@ void Renderer::drawModel(World &world) {
         }
 
         for (auto part : model.parts) {
+
             const MeshAsset& meshAsset = resourceManager.getMeshAsset(part.meshHandle);
             const MaterialAsset& materialAsset = resourceManager.getMaterialAsset(part.materialHandle);
 
@@ -177,8 +181,7 @@ void Renderer::drawModel(World &world) {
             GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], materialAsset.specularStrength);
             GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], materialAsset.shininess);
         
-            const GPUMesh& gpuMesh = meshAsset.gpuMesh;
-            GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
+            GLBackend::drawIndexed(meshAsset.gpuMesh, shaderAsset.shaderProgram);
         }
     }
 }

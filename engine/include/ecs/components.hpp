@@ -32,19 +32,12 @@ struct Mesh {
     MeshHandle handle {};
 };
 
-struct Renderable {
-    bool visible {true};
+struct Material {
+    MaterialHandle handle;
 };
 
-struct Material {
-    ShaderHandle shaderHandle {};
-
-    TextureHandle diffuseMap {};
-    TextureHandle specularMap {};
-
-    glm::vec4 baseColor {1.0f};
-    float specularStrength {};
-    float shininess {};
+struct Renderable {
+    bool visible {true};
 };
 
 struct Model {

@@ -8,6 +8,7 @@
 
 constexpr int MaxPointLights = 32;
 constexpr int MaxSpotlights = 12;
+constexpr int MaxDirectionalLights = 1;
 
 namespace TextureUnit {
     constexpr uint32_t diffuseMap = 0;
