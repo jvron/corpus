@@ -83,14 +83,14 @@ struct MaterialAsset {
 };
 
 struct ModelOptions {
-
     bool storeMeshData {false};
 
+    // affects the whole model 
     ShaderHandle shader {};
 
     Tex2DParameters diffuseParameters;
     Tex2DParameters specularParameters;
-
+    
     float materialShininess {};
     float materialSpecularStrength {};
 };
@@ -126,6 +126,8 @@ public:
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
 
     Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
+
+    Material loadMaterial(const MaterialAsset& materialAsset);
     MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
 
     void destroy();

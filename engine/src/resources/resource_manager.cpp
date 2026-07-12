@@ -246,9 +246,9 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
             AssetLoader::freeImage(textureImport.imageData);
         }
 
-        const MaterialHandle materialHandle = materialAssets.size();
-        materialAssets.push_back(materialAsset);
-        materialHandles.push_back(materialHandle);
+        Material material = loadMaterial(materialAsset);
+
+        materialHandles.push_back(material.handle);
     }
         
     Model model;
@@ -256,11 +256,11 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
 
     for (const auto& meshImport : modelImport.meshImports) {
 
-        const MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
+        MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
 
         const MeshData& meshData = meshImport.meshData;
     
-        const Mesh mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
+        Mesh mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
 
         Model::Part part = {
             .meshHandle = mesh.handle,
@@ -271,6 +271,18 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
     }
 
     return model;
+}
+
+Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
+
+    MaterialHandle handle = materialAssets.size();
+    materialAssets.push_back(materialAsset);
+
+    Material material = {
+        .handle = handle
+    };
+
+    return material;
 }
 
 MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
