@@ -4,9 +4,17 @@
 #include "platform/clock.hpp"
 #include "engine/world.hpp"
 
+double Clock::getRawTime() {
+    return glfwGetTime();
+}
+
+double Clock::getFrameTime(World &world) {
+    return world.engineState.time.currentTime;
+}
+
 void Clock::init(World &world) {
     
-    double now = glfwGetTime();
+    double now = getRawTime();
 
     world.engineState.time.fpsTimer = now;
     world.engineState.time.currentTime = now;
@@ -16,7 +24,7 @@ void Clock::init(World &world) {
 void Clock::tick(World &world) {
     Time& time = world.engineState.time;
 
-    double now = glfwGetTime();
+    double now = getRawTime();
     
     time.currentTime = now;
 
