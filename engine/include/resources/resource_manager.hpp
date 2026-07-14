@@ -69,13 +69,20 @@ struct Tex2DParameters {
     bool enableMipmap {true};
 };
 
+namespace DefaultTexture {
+    constexpr TextureHandle White = 0;
+    constexpr TextureHandle Black = 1; 
+
+    constexpr uint32_t Count = Black + 1;
+};
+
 struct MaterialAsset {
     std::string name;
 
     ShaderHandle shaderHandle {};
 
-    TextureHandle diffuseMap {};
-    TextureHandle specularMap {};
+    TextureHandle diffuseMap {DefaultTexture::White};
+    TextureHandle specularMap {DefaultTexture::White};
 
     glm::vec4 baseColor {1.0f};
     float specularStrength {};
@@ -107,6 +114,8 @@ private:
     
 public:
 
+    void init();
+
     ShaderHandle createShaderProgram(const std::vector<std::string>& shaderPaths);
     ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
 
@@ -118,7 +127,7 @@ public:
     Texture& getTexture(TextureHandle textureHandle);
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
 
-    Material loadMaterial(const MaterialAsset& materialAsset);
+    Material loadMaterial(MaterialAsset& materialAsset);
     MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
 
     MeshAsset& getMeshAsset(MeshHandle meshHandle);

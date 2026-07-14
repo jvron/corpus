@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -9,6 +10,44 @@
 #include "ecs/components.hpp"
 #include "renderer/opengl/gl_backend.hpp" 
 #include "resources/asset_loader.hpp"
+
+void ResourceManager::init() {
+
+    auto createTexture = [](const ImageData& imageData) {
+        Texture texture;
+
+        GLBackend::createTexture2D(texture.id);
+        GLBackend::allocateTexture2D(texture.id, imageData.format, imageData.width, imageData.height);
+        GLBackend::uploadTexture2D(texture.id, imageData.format, imageData.width, imageData.height, imageData.data);
+
+        return texture;
+    };
+
+    if (textures.size() < DefaultTexture::Count) {
+        textures.resize(DefaultTexture::Count);
+    }
+
+    uint8_t whitePixels[] = {255, 255, 255, 255};
+  
+    ImageData whiteImageData = {
+        .width = 1,
+        .height = 1,
+        .data = whitePixels,
+        .format = TexFormat::Rgba,
+    };
+    textures[DefaultTexture::White] = createTexture(whiteImageData);
+
+    uint8_t blackPixels[] = {0, 0, 0, 0};
+
+    ImageData blackImageData = {
+        .width = 1,
+        .height = 1,
+        .data = blackPixels,
+        .format = TexFormat::Rgba,
+    };
+
+    textures[DefaultTexture::Black] = createTexture(blackImageData);
+}
 
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
@@ -142,7 +181,7 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
     }
 }
 
-Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
+Material ResourceManager::loadMaterial(MaterialAsset& materialAsset) {
 
     MaterialHandle handle = materialAssets.size();
     materialAssets.push_back(materialAsset);

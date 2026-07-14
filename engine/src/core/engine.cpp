@@ -33,6 +33,7 @@ void Engine::startUp(World &world) {
     Clock::init(world);
 
     scheduler.init(world);
+    world.resourceManager.init();
     
     registerComponents(world);
 
@@ -45,8 +46,6 @@ void Engine::startUp(World &world) {
 }
 
 void Engine::run(World &world) {
-
-    world.resourceManager.buildGPUMesh(world);
 
     while (!Window::shouldClose(world)) {
 
