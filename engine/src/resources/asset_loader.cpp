@@ -17,7 +17,7 @@ std::string AssetLoader::readFile(const std::string &filePath) {
 
     std::ifstream file;
     file.open(filePath);
-    
+
     if (!file) {
         std::cerr << "[ERROR]: File not found at "<< filePath <<"\n";
         return "";
@@ -34,7 +34,7 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
 
     ImageData imageData;
     int channels {};
-    
+
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(filePath.c_str(), &imageData.width, &imageData.height, &channels, 0);
 
@@ -52,21 +52,21 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
             imageData.format = TexFormat::Rg;
             break;
         case 3:
-            imageData.format = TexFormat::Rgb;
+            imageData.format = TexFormat::Rgb; 
             break;
         case 4:
             imageData.format = TexFormat::Rgba;
             break;
         default:
-            std::cerr << "[ERROR](stb_image): Unsupported number of channels: " << channels <<", for texture: " << filePath <<"\n";
+            std::cerr << "[ERROR](stb_image): Unsupported number of channels: " << channels <<", for texture: " << filePath << "\n";
             break;
-    }
+    }  
 
     return imageData;
-} 
+}
 
 void AssetLoader::freeImage(ImageData& imageData) {
-    
+
     if (imageData.data) {
 
         stbi_image_free(imageData.data);
@@ -77,21 +77,21 @@ void AssetLoader::freeImage(ImageData& imageData) {
 void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal) {
 
     VertexAttribute position = {
-        .location = AttributeLocation::Position, 
-        .componentCount = 3, 
-        .type = ComponentType::Float, 
-        .normalized = false, 
-        .relativeOffset = offsetof(Vertex, position) 
+        .location = AttributeLocation::Position,
+        .componentCount = 3,
+        .type = ComponentType::Float,
+        .normalized = false,
+        .relativeOffset = offsetof(Vertex, position)
     };
 
     layout.attributes.push_back(position);
 
     if (hasColor) {
         VertexAttribute color = {
-            .location = AttributeLocation::Color, 
-            .componentCount = 4, 
-            .type = ComponentType::Float, 
-            .normalized = false, 
+            .location = AttributeLocation::Color,
+            .componentCount = 4,
+            .type = ComponentType::Float,
+            .normalized = false,
             .relativeOffset = offsetof(Vertex, color)
         };
 
@@ -100,25 +100,25 @@ void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool has
 
     if (hasUv) {
         VertexAttribute uv = {
-            .location = AttributeLocation::Uv, 
-            .componentCount = 2, 
-            .type = ComponentType::Float,  
-            .normalized = false, 
+            .location = AttributeLocation::Uv,
+            .componentCount = 2,
+            .type = ComponentType::Float,
+            .normalized = false,
             .relativeOffset = offsetof(Vertex, uv)
         };
-    
+
         layout.attributes.push_back(uv);
     }
 
     if (hasNormal) {
         VertexAttribute normal = {
-            .location = AttributeLocation::Normal, 
-            .componentCount = 3, 
-            .type = ComponentType::Float, 
-            .normalized = false, 
+            .location = AttributeLocation::Normal,
+            .componentCount = 3,
+            .type = ComponentType::Float,
+            .normalized = false,
             .relativeOffset = offsetof(Vertex, normal)
         };
-        
+
         layout.attributes.push_back(normal);
     }
 }
@@ -169,12 +169,11 @@ MeshData processMesh(const aiMesh& mesh) {
         else {
             vertex.color = {1.0f, 1.0f, 1.0f, 1.0f};
         }
-        
-        if (mesh.mTextureCoords[0]) {
 
+        if (mesh.mTextureCoords[0]) {
             const aiVector3D& texCoords = mesh.mTextureCoords[0][i];
             vertex.uv = {
-                texCoords.x, 
+                texCoords.x,
                 texCoords.y
             };
 
@@ -197,21 +196,22 @@ MeshData processMesh(const aiMesh& mesh) {
     }
 
     VertexLayout layout;
-    buildVertexLayout(layout, hasColor, hasUv, hasNormal);  
+    buildVertexLayout(layout, hasColor, hasUv, hasNormal);
     layout.bindingIndex = 0;
-    layout.stride = sizeof(Vertex);      
+    layout.stride = sizeof(Vertex);
     meshData.vertexLayout = layout;
 
     return meshData;
 }
 
-void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path modelDir, aiTextureType aiTexType, TexType texType) {
+void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path& modelDir, aiTextureType aiTexType, TexType texType) {
 
     size_t textureCount = material.GetTextureCount(aiTexType);
 
     materialImport.textureImports.reserve(materialImport.textureImports.size() + textureCount);
 
     for (size_t i = 0; i < textureCount; i++) {
+        
         aiString path;
         material.GetTexture(aiTexType, i, &path);
 
@@ -222,9 +222,9 @@ void processTexture(const aiMaterial& material, MaterialImport& materialImport, 
         TextureImport textureImport;
         textureImport.imageData = imageData;
         textureImport.type = texType;
-        textureImport.path = texturePath;
+        textureImport.path = std::move(texturePath);
 
-        materialImport.textureImports.push_back(textureImport);
+        materialImport.textureImports.push_back(std::move(textureImport));
     }
 }
 
@@ -232,24 +232,23 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport, const std:
 
     modelImport.materialImports.reserve(scene.mNumMaterials);
 
-    for (size_t i = 0; i < scene.mNumMaterials; i++) {    
+    for (size_t i = 0; i < scene.mNumMaterials; i++) {
         const aiMaterial* material = scene.mMaterials[i];
 
         MaterialImport materialImport;
 
-        aiString name = material->GetName();
-
-        if (name.length > 0) {
-            materialImport.name = name.C_Str();
+        std::string name = material->GetName().C_Str();
+        if (name.empty()) {
+            materialImport.name = "Material_" + std::to_string(i);
         }
         else {
-            materialImport.name = "Material_" + std::to_string(i);
+            materialImport.name = std::move(name);
         }
 
         processTexture(*material, materialImport,  modelDir, aiTextureType_DIFFUSE, TexType::DiffuseMap);
         processTexture(*material, materialImport, modelDir, aiTextureType_SPECULAR, TexType::SpecularMap);
 
-        modelImport.materialImports.push_back(materialImport);
+        modelImport.materialImports.push_back(std::move(materialImport));
     }
 }
 
@@ -262,14 +261,14 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
 
         if (name.empty()) {
             name = "Mesh_" + std::to_string(modelImport.meshImports.size());
-        } 
+        }
 
         MeshImport meshImport = {
-            .name = name,
-            .meshData = processMesh(*mesh), 
+            .name = std::move(name),
+            .meshData = processMesh(*mesh),
             .materialIndex = mesh->mMaterialIndex
         };
-        modelImport.meshImports.push_back(meshImport);
+        modelImport.meshImports.push_back(std::move(meshImport));
     }
 
     //process child nodes
@@ -281,7 +280,7 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
 ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
     constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
-    
+
     ModelImport modelImport;
 
     Assimp::Importer importer;
