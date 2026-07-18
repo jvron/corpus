@@ -35,4 +35,4 @@ FetchContent_MakeAvailable(assimp)
 
 add_subdirectory(engine)
 add_subdirectory(editor)
-add_subdirectory(game)
+add_subdirectory(examples/sandbox)
