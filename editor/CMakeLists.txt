@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(corpus)
-
 add_executable(corpus
     src/main.cpp
 )
