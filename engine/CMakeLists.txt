@@ -16,19 +16,19 @@ target_include_directories(engine
 
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/glm
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glm
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb
         
 )
 
 # glad
 
 add_library(glad STATIC
-    external/glad/src/glad.c
+    third_party/glad/src/glad.c
 )
 
 target_include_directories(glad PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include
 )
 
 target_precompile_headers(engine PRIVATE
