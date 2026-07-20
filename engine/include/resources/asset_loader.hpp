@@ -34,6 +34,7 @@ namespace AttributeLocation {
     constexpr uint32_t Color = 1;
     constexpr uint32_t Uv = 2;
     constexpr uint32_t Normal = 3;
+    constexpr uint32_t Tangent = 4;
 }
 
 struct Vertex {
@@ -41,6 +42,7 @@ struct Vertex {
     glm::vec4 color {};
     glm::vec2 uv {};
     glm::vec3 normal {};
+    glm::vec4 tangent {};
 };
 
 struct VertexAttribute {

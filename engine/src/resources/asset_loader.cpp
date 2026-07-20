@@ -5,6 +5,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <assimp/vector3.h>
+#include <glm/geometric.hpp>
 #include <filesystem>
 #include <string>
 #include <iostream>
@@ -74,7 +76,7 @@ void AssetLoader::freeImage(ImageData& imageData) {
     }
 }
 
-void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal) {
+void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal, bool hasTangent) {
 
     VertexAttribute position = {
         .location = AttributeLocation::Position,
@@ -121,14 +123,27 @@ void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool has
 
         layout.attributes.push_back(normal);
     }
+
+    if (hasTangent) {
+        VertexAttribute tangent = {
+            .location = AttributeLocation::Tangent,
+            .componentCount = 4,
+            .type = ComponentType::Float,
+            .normalized = false,
+            .relativeOffset = offsetof(Vertex, tangent)
+        };
+
+        layout.attributes.push_back(tangent);
+    }
 }
 
 MeshData processMesh(const aiMesh& mesh) {
     MeshData meshData;
 
-    bool hasColor = false;
-    bool hasUv = false;
-    bool hasNormal = false;
+    bool hasColor = mesh.HasVertexColors(0);
+    bool hasUv = mesh.HasTextureCoords(0);
+    bool hasNormal = mesh.HasNormals();
+    bool hasTangent = mesh.HasTangentsAndBitangents() && hasNormal;
 
     meshData.vertices.reserve(mesh.mNumVertices);
 
@@ -142,20 +157,7 @@ MeshData processMesh(const aiMesh& mesh) {
             pos.z
         };
 
-        if (mesh.HasNormals()) {
-            const aiVector3D& norm = mesh.mNormals[i];
-            vertex.normal = {
-                norm.x,
-                norm.y,
-                norm.z
-            };
-            hasNormal = true;
-        }
-        else {
-            vertex.normal = {0.0f, 0.0f, 0.0f};
-        }
-
-        if (mesh.mColors[0]) {
+        if (hasColor) {
             const aiColor4D& color = mesh.mColors[0][i];
             vertex.color = {
                 color.r,
@@ -163,28 +165,59 @@ MeshData processMesh(const aiMesh& mesh) {
                 color.b,
                 color.a
             };
-
-            hasColor = true;
         }
         else {
             vertex.color = {1.0f, 1.0f, 1.0f, 1.0f};
         }
 
-        if (mesh.mTextureCoords[0]) {
+        if (hasUv) {
             const aiVector3D& texCoords = mesh.mTextureCoords[0][i];
             vertex.uv = {
                 texCoords.x,
                 texCoords.y
             };
-
-            hasUv = true;
         }
         else {
             vertex.uv = {0.0f, 0.0f};
         }
 
+        if (hasNormal) {
+            const aiVector3D& norm = mesh.mNormals[i];
+            vertex.normal = {
+                norm.x,
+                norm.y,
+                norm.z
+            };
+        }
+        else {
+            vertex.normal = {0.0f, 0.0f, 0.0f};
+        }
+
+        if (hasTangent) {
+            const aiVector3D& T = mesh.mTangents[i];
+            const aiVector3D& B = mesh.mBitangents[i];
+            const aiVector3D& N = mesh.mNormals[i];
+
+            glm::vec3 tangent = {T.x, T.y, T.z};
+            glm::vec3 biTangent = {B.x, B.y, B.z};
+            glm::vec3 normal = {N.x, N.y, N.z};
+
+            float w = glm::dot(glm::cross(normal, tangent), biTangent) < 0.0f ? -1.0f : 1.0f;
+
+            vertex.tangent = {
+                tangent.x,
+                tangent.y,
+                tangent.z,
+                w
+            };
+        }
+        else {
+            vertex.tangent = {0.0f, 0.0f, 0.0f, 0.0f};
+        }
+
         meshData.vertices.push_back(vertex);
     }
+
 
     meshData.indices.reserve(mesh.mNumFaces * 3);
     for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
@@ -196,7 +229,8 @@ MeshData processMesh(const aiMesh& mesh) {
     }
 
     VertexLayout layout;
-    buildVertexLayout(layout, hasColor, hasUv, hasNormal);
+    buildVertexLayout(layout, hasColor, hasUv, hasNormal, hasTangent);
+
     layout.bindingIndex = 0;
     layout.stride = sizeof(Vertex);
     meshData.vertexLayout = layout;
@@ -279,8 +313,8 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
 
 ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
-    constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
-
+    constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_FlipUVs | 
+                                        aiProcess_GenNormals | aiProcess_CalcTangentSpace;
     ModelImport modelImport;
 
     Assimp::Importer importer;
