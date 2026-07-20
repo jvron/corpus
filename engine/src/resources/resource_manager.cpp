@@ -45,8 +45,17 @@ void ResourceManager::init() {
         .data = blackPixels,
         .format = TexFormat::Rgba,
     };
-
     textures[DefaultTexture::Black] = createTexture(blackImageData);
+
+    uint8_t normalPixels[] = {128, 128, 255, 255};
+    
+    ImageData normalImageData = {
+        .width = 1,
+        .height = 1,
+        .data = normalPixels,
+        .format = TexFormat::Rgba,
+    };
+    textures[DefaultTexture::Normal] = createTexture(normalImageData);
 }
 
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {

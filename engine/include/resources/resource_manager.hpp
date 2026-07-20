@@ -72,8 +72,9 @@ struct Tex2DParameters {
 namespace DefaultTexture {
     constexpr TextureHandle White = 0;
     constexpr TextureHandle Black = 1; 
+    constexpr TextureHandle Normal = 2;
 
-    constexpr uint32_t Count = Black + 1;
+    constexpr uint32_t Count = Normal + 1;
 };
 
 struct MaterialAsset {
@@ -83,7 +84,7 @@ struct MaterialAsset {
 
     TextureHandle diffuseMap {DefaultTexture::White};
     TextureHandle specularMap {DefaultTexture::White};
-    TextureHandle normalMap {};
+    TextureHandle normalMap {DefaultTexture::Normal};
 
     glm::vec4 baseColor {1.0f};
     float specularStrength {};
