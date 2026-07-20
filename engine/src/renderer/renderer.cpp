@@ -25,8 +25,8 @@ void Renderer::init(World &world) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    GLBackend::createUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), BlockBinding::lightBlock);
-    GLBackend::createUBO(world.engineState.renderState.cameraUBO, sizeof(GPUCameraBlock), BlockBinding::cameraBlock);
+    GLBackend::createUBO(world.engineState.renderState.lightUBO, sizeof(GPULightBlock), BlockBinding::LightBlock);
+    GLBackend::createUBO(world.engineState.renderState.cameraUBO, sizeof(GPUCameraBlock), BlockBinding::CameraBlock);
 }
 
 GPULightBlock Renderer::gatherLightData(World& world) {
@@ -130,12 +130,16 @@ void Renderer::drawMesh(World& world) {
         ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(materialAsset.shaderHandle);
 
         const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
-        GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::diffuseMap);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::diffuseMap);
+        GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::DiffuseMap);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::DiffuseMap);
 
         const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
-        GLBackend::bindTextureUnit(specularMap.id, TextureUnit::specularMap);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::specularMap);
+        GLBackend::bindTextureUnit(specularMap.id, TextureUnit::SpecularMap);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::SpecularMap);
+
+        const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
+        GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
+        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["normalMap"], TextureUnit::NormalMap);
 
         glm::mat4 modelMatrix = getModelMatrix(transform);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
@@ -167,12 +171,16 @@ void Renderer::drawModel(World &world) {
             ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(materialAsset.shaderHandle);
 
             const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
-            GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::diffuseMap);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::diffuseMap);
+            GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::DiffuseMap);
+            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::DiffuseMap);
 
             const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
-            GLBackend::bindTextureUnit(specularMap.id, TextureUnit::specularMap);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::specularMap);
+            GLBackend::bindTextureUnit(specularMap.id, TextureUnit::SpecularMap);
+            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::SpecularMap);
+
+            const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
+            GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
+            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["normalMap"], TextureUnit::NormalMap);
 
             glm::mat4 modelMatrix = getModelMatrix(transform);
             GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include "ecs/components.hpp"
@@ -11,13 +12,14 @@ constexpr int MaxSpotlights = 12;
 constexpr int MaxDirectionalLights = 1;
 
 namespace TextureUnit {
-    constexpr uint32_t diffuseMap = 0;
-    constexpr uint32_t specularMap = 1;
+    constexpr uint32_t DiffuseMap = 0;
+    constexpr uint32_t SpecularMap = 1;
+    constexpr uint32_t NormalMap = 2;
 }
 
 namespace BlockBinding {
-    constexpr uint32_t lightBlock = 0;
-    constexpr uint32_t cameraBlock = 1;
+    constexpr uint32_t LightBlock = 0;
+    constexpr uint32_t CameraBlock = 1;
 }
 
 struct GPUPointLight {
