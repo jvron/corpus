@@ -80,7 +80,6 @@ struct ImageData {
 };
 
 struct TextureImport {
-    ImageData imageData;
     TexType type;
     std::string path;
 };

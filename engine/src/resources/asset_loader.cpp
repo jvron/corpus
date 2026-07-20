@@ -213,7 +213,7 @@ MeshData processMesh(const aiMesh& mesh) {
             };
         }
         else {
-            vertex.tangent = {0.0f, 0.0f, 0.0f, 0.0f};
+            vertex.tangent = {0.0f, 0.0f, 0.0f, 1.0f};
         }
 
         meshData.vertices.push_back(vertex);
@@ -250,14 +250,9 @@ void processTexture(const aiMaterial& material, MaterialImport& materialImport, 
         aiString path;
         material.GetTexture(aiTexType, i, &path);
 
-        std::filesystem::path texturePath = modelDir / path.C_Str();
-
-        ImageData imageData = AssetLoader::loadImage(texturePath.string());
-
         TextureImport textureImport;
-        textureImport.imageData = imageData;
         textureImport.type = texType;
-        textureImport.path = std::move(texturePath);
+        textureImport.path = modelDir / path.C_Str();
 
         materialImport.textureImports.push_back(std::move(textureImport));
     }

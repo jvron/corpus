@@ -48,7 +48,7 @@ void ResourceManager::init() {
     textures[DefaultTexture::Black] = createTexture(blackImageData);
 
     uint8_t normalPixels[] = {128, 128, 255, 255};
-    
+
     ImageData normalImageData = {
         .width = 1,
         .height = 1,
@@ -286,7 +286,7 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
                 continue;;
             }
 
-            TextureHandle texHandle = createTexture(textureImport.imageData);
+            TextureHandle texHandle = loadTexture(textureImport.path);
             
             switch (textureImport.type) {
                 case TexType::DiffuseMap:
@@ -305,8 +305,6 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
                     std::cerr << "[ERROR]: Unknown texture type provided\n";
                     break;
             }
-
-            AssetLoader::freeImage(textureImport.imageData);
         }
 
         Material material = loadMaterial(materialAsset);
