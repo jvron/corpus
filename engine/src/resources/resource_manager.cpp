@@ -181,7 +181,7 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
     }
 }
 
-Material ResourceManager::loadMaterial(MaterialAsset& materialAsset) {
+Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
 
     MaterialHandle handle = materialAssets.size();
     materialAssets.push_back(materialAsset);
@@ -234,7 +234,7 @@ GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
     return meshAssets[meshHandle].gpuMesh; 
 }
 
-Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData) {
+Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& meshName, bool storeMeshData) {
 
     MeshAsset meshAsset; 
     meshAsset.name = meshName;
@@ -287,6 +287,10 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
                 case TexType::SpecularMap:
                     setTex2DParameters(texHandle, modelOptions.specularParameters);
                     materialAsset.specularMap = texHandle;
+                    break;
+                case TexType::NormalMap:
+                    setTex2DParameters(texHandle, modelOptions.normalParameters);
+                    materialAsset.normalMap = texHandle;
                     break;
                 default:
                     std::cerr << "[ERROR]: Unknown texture type provided\n";

@@ -83,6 +83,7 @@ struct MaterialAsset {
 
     TextureHandle diffuseMap {DefaultTexture::White};
     TextureHandle specularMap {DefaultTexture::White};
+    TextureHandle normalMap {};
 
     glm::vec4 baseColor {1.0f};
     float specularStrength {};
@@ -97,6 +98,7 @@ struct ModelOptions {
 
     Tex2DParameters diffuseParameters;
     Tex2DParameters specularParameters;
+    Tex2DParameters normalParameters;
     
     float materialShininess {};
     float materialSpecularStrength {};
@@ -127,7 +129,7 @@ public:
     Texture& getTexture(TextureHandle textureHandle);
     void setTex2DParameters(TextureHandle textureHandle, const Tex2DParameters& parameters);
 
-    Material loadMaterial(MaterialAsset& materialAsset);
+    Material loadMaterial(const MaterialAsset& materialAsset);
     MaterialAsset& getMaterialAsset(MaterialHandle materialHandle);
 
     MeshAsset& getMeshAsset(MeshHandle meshHandle);
@@ -135,7 +137,7 @@ public:
     GPUMesh buildGPUMesh(const MeshData& meshData);
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
-    Mesh loadMesh(const MeshData& meshData, const std::string meshName, bool storeMeshData = false);
+    Mesh loadMesh(const MeshData& meshData, const std::string& meshName, bool storeMeshData = false);
     Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
 
     void destroy();

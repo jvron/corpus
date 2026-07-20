@@ -4,6 +4,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/material.h>
 
 #include <assimp/vector3.h>
 #include <glm/geometric.hpp>
@@ -281,6 +282,8 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport, const std:
 
         processTexture(*material, materialImport,  modelDir, aiTextureType_DIFFUSE, TexType::DiffuseMap);
         processTexture(*material, materialImport, modelDir, aiTextureType_SPECULAR, TexType::SpecularMap);
+        processTexture(*material, materialImport, modelDir, aiTextureType_NORMALS, TexType::NormalMap);
+        processTexture(*material, materialImport, modelDir, aiTextureType_HEIGHT, TexType::NormalMap);
 
         modelImport.materialImports.push_back(std::move(materialImport));
     }

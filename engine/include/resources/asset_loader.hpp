@@ -17,6 +17,7 @@ enum class TexFormat {
 enum class TexType {
     DiffuseMap,
     SpecularMap,
+    NormalMap,
     Albedo,
     Metallic,
     Unknown
