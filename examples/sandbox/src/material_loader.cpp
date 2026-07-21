@@ -1,5 +1,3 @@
-
-
 #include "header.hpp"
 
 void loadShader(World& world, MaterialAsset& material)
@@ -54,7 +52,4 @@ void loadTexture(World& world, MaterialAsset& material)
 
     world.resourceManager.setTex2DParameters(material.diffuseMap, textureParams);
     world.resourceManager.setTex2DParameters(material.specularMap, textureParams);
-
-    world.resourceManager.setUniformLocation(material.shaderHandle, "diffuseMap");
-    world.resourceManager.setUniformLocation(material.shaderHandle, "specularMap");
 }

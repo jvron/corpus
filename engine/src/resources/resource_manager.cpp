@@ -8,6 +8,7 @@
 
 #include "resources/resource_manager.hpp"
 #include "ecs/components.hpp"
+#include "renderer/renderer.hpp"
 #include "renderer/opengl/gl_backend.hpp" 
 #include "resources/asset_loader.hpp"
 
@@ -58,6 +59,19 @@ void ResourceManager::init() {
     textures[DefaultTexture::Normal] = createTexture(normalImageData);
 }
 
+void ResourceManager::initShaderSamplers(ShaderHandle shaderHandle) {
+
+    ShaderAsset& shaderAsset = getShaderAsset(shaderHandle);
+
+    setUniformLocation(shaderHandle, "diffuseMap");
+    setUniformLocation(shaderHandle, "specularMap");
+    setUniformLocation(shaderHandle, "normalMap");
+
+    GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::DiffuseMap);
+    GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::SpecularMap);
+    GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["normalMap"], TextureUnit::NormalMap);
+}
+
 ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string> &filePaths) {
 
     ShaderProgram program = GLBackend::createShaderProgram();
@@ -99,6 +113,8 @@ ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string>
     ShaderAsset shaderAsset;
     shaderAsset.shaderProgram = program;
     shaderAssets.push_back(shaderAsset);
+
+    initShaderSamplers(handle);
 
     return handle;
 }
@@ -198,7 +214,6 @@ Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
     Material material = {
         .handle = handle
     };
-
     return material;
 }
 
@@ -283,7 +298,7 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
             
             if (textureImport.type == TexType::Unknown) {
                 std::cerr << "[ERROR]: Unknown texture type provided\n";
-                continue;;
+                continue;
             }
 
             TextureHandle texHandle = loadTexture(textureImport.path);

@@ -121,6 +121,7 @@ public:
 
     ShaderHandle createShaderProgram(const std::vector<std::string>& shaderPaths);
     ShaderProgram getShaderProgram(ShaderHandle shaderHandle);
+    void initShaderSamplers(ShaderHandle shaderHandle);
 
     ShaderAsset& getShaderAsset(ShaderHandle shaderHandle);
     void setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName);

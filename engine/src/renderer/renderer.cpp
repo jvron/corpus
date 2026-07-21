@@ -131,15 +131,12 @@ void Renderer::drawMesh(World& world) {
 
         const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
         GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::DiffuseMap);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::DiffuseMap);
 
         const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
         GLBackend::bindTextureUnit(specularMap.id, TextureUnit::SpecularMap);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::SpecularMap);
 
         const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
         GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
-        GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["normalMap"], TextureUnit::NormalMap);
 
         glm::mat4 modelMatrix = getModelMatrix(transform);
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
@@ -172,15 +169,12 @@ void Renderer::drawModel(World &world) {
 
             const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
             GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::DiffuseMap);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["diffuseMap"], TextureUnit::DiffuseMap);
 
             const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
             GLBackend::bindTextureUnit(specularMap.id, TextureUnit::SpecularMap);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["specularMap"], TextureUnit::SpecularMap);
-
+     
             const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
             GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["normalMap"], TextureUnit::NormalMap);
 
             glm::mat4 modelMatrix = getModelMatrix(transform);
             GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
