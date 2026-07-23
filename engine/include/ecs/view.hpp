@@ -5,11 +5,8 @@
 #include <tuple>
 #include <vector>
 
-#include "ecs/components.hpp"
 #include "ecs/registry.hpp"
 #include "ecs/sparse_set.hpp"
-
-struct Entity;
 
 template <typename ... Component>
 class View {
@@ -27,6 +24,9 @@ public:
 
         int leaderIndex = 0;
         for (uint32_t i = 0; i < sizeof...(Component); i++) {
+    
+            assert(poolPtrs[i] && "[ERROR]:  Component type must be registered via registerComponent<T>() before requesting a view");
+            
             if (poolPtrs[i]->size() < poolPtrs[leaderIndex]->size()) {
                 leaderIndex = i;
             }
@@ -95,5 +95,4 @@ public:
     Iterator end() {
         return Iterator(*this, leaderPool, leaderPool.size());
     }
-
 };
