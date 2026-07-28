@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 #include "resources/asset_loader.hpp"
 
@@ -219,7 +220,6 @@ MeshData processMesh(const aiMesh& mesh) {
         meshData.vertices.push_back(vertex);
     }
 
-
     meshData.indices.reserve(mesh.mNumFaces * 3);
     for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
         const aiFace& face = mesh.mFaces[i];
@@ -284,15 +284,19 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport, const std:
     }
 }
 
-void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImport) {
+NodeImport processNode(const aiNode& node, const aiScene& scene) {
+
+    NodeImport nodeImport;
+    nodeImport.name = node.mName.C_Str(); 
 
     for (size_t i = 0; i < node.mNumMeshes; i++) {
+
         const aiMesh* mesh =  scene.mMeshes[node.mMeshes[i]];
 
         std::string name = mesh->mName.C_Str();
 
         if (name.empty()) {
-            name = "Mesh_" + std::to_string(modelImport.meshImports.size());
+            name = "Mesh_" + std::to_string(nodeImport.meshImports.size());
         }
 
         MeshImport meshImport = {
@@ -300,19 +304,24 @@ void processNode(const aiNode& node, const aiScene& scene, ModelImport& modelImp
             .meshData = processMesh(*mesh),
             .materialIndex = mesh->mMaterialIndex
         };
-        modelImport.meshImports.push_back(std::move(meshImport));
+        nodeImport.meshImports.push_back(std::move(meshImport));
     }
 
     //process child nodes
     for (size_t i = 0; i < node.mNumChildren; i++) {
-        processNode(*node.mChildren[i], scene, modelImport);
+
+        NodeImport childNode = processNode(*node.mChildren[i], scene);
+
+        nodeImport.children.push_back(std::make_unique<NodeImport>(std::move(childNode)));
     }
+
+    return nodeImport;
 }
 
 ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
-    constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_FlipUVs | 
-                                        aiProcess_GenNormals | aiProcess_CalcTangentSpace;
+    constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs;
+
     ModelImport modelImport;
 
     Assimp::Importer importer;
@@ -330,7 +339,8 @@ ModelImport AssetLoader::loadModel(const std::string& filePath) {
     std::filesystem::path modelDir = path.parent_path();
 
     processMaterials(*scene, modelImport, modelDir);
-    processNode(*scene->mRootNode, *scene, modelImport);
+
+    modelImport.root = processNode(*scene->mRootNode, *scene);
 
     return modelImport;
 }

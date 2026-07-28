@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 #include <glm/vec2.hpp>
@@ -89,9 +90,15 @@ struct MaterialImport {
     std::vector<TextureImport> textureImports;
 };
 
-struct ModelImport {
+struct NodeImport {
     std::string name;
     std::vector<MeshImport> meshImports;
+    std::vector<std::unique_ptr<NodeImport>> children;
+};
+
+struct ModelImport {
+    std::string name;
+    NodeImport root;
     std::vector<MaterialImport> materialImports;
 };
 
