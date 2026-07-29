@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
@@ -279,20 +280,44 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& mesh
     return mesh;
 }
 
-Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions& modelOptions) {
+SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData) {
 
+    SceneNode sceneNode;
+    sceneNode.name = node.name;
+
+    SceneNodeID nodeID = scene.nodes.size();
+    scene.nodes.push_back(sceneNode);
+
+    for (auto& meshImport : node.meshImports) {
+        Mesh mesh = loadMesh(meshImport.meshData, meshImport.name, storeMeshData);
+
+        scene.nodes[nodeID].materials.push_back(materialHandles[meshImport.materialIndex]);
+        scene.nodes[nodeID].meshes.push_back(mesh.handle);
+    }
+
+    for (size_t i = 0; i < node.children.size(); i++) {
+
+        SceneNodeID childID = processNodeImport(scene, *node.children[i], materialHandles, storeMeshData);
+        scene.nodes[nodeID].children.push_back(childID);
+    }
+
+    return nodeID;
+}
+
+SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneImportOptions& options)
+{
     ModelImport modelImport = AssetLoader::loadModel(filePath);
 
     std::vector<MaterialHandle> materialHandles;
     materialHandles.reserve(modelImport.materialImports.size());
 
-    for (auto& materialImport : modelImport.materialImports) {
+    for (const auto& materialImport : modelImport.materialImports) {
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
-        materialAsset.shaderHandle = modelOptions.shader;
-        materialAsset.shininess = modelOptions.materialShininess;
-        materialAsset.specularStrength = modelOptions.materialSpecularStrength;
+        materialAsset.shaderHandle = options.shader;
+        materialAsset.shininess = options.materialShininess;
+        materialAsset.specularStrength = options.materialSpecularStrength;
 
         for (auto& textureImport : materialImport.textureImports) {
             
@@ -305,15 +330,15 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
             
             switch (textureImport.type) {
                 case TexType::DiffuseMap:
-                    setTex2DParameters(texHandle, modelOptions.diffuseParameters);
+                    setTex2DParameters(texHandle, options.diffuseParameters);
                     materialAsset.diffuseMap = texHandle;
                     break;
                 case TexType::SpecularMap:
-                    setTex2DParameters(texHandle, modelOptions.specularParameters);
+                    setTex2DParameters(texHandle, options.specularParameters);
                     materialAsset.specularMap = texHandle;
                     break;
                 case TexType::NormalMap:
-                    setTex2DParameters(texHandle, modelOptions.normalParameters);
+                    setTex2DParameters(texHandle, options.normalParameters);
                     materialAsset.normalMap = texHandle;
                     break;
                 default:
@@ -326,27 +351,15 @@ Model ResourceManager::loadModel(const std::string& filePath, const ModelOptions
 
         materialHandles.push_back(material.handle);
     }
-        
-    Model model;
-    model.modelName = modelImport.name;
 
-    for (const auto& meshImport : modelImport.meshImports) {
+    SceneAsset sceneAsset;
+    sceneAsset.name = modelImport.name;
+    sceneAsset.root = processNodeImport(sceneAsset, modelImport.root, materialHandles, options.storeMeshData);
 
-        MaterialHandle materialHandle = materialHandles[meshImport.materialIndex];
+    SceneHandle sceneHandle = sceneAssets.size();
+    sceneAssets.push_back(std::move(sceneAsset));
 
-        const MeshData& meshData = meshImport.meshData;
-    
-        Mesh mesh = loadMesh(meshData, meshImport.name, modelOptions.storeMeshData);
-
-        Model::Part part = {
-            .meshHandle = mesh.handle,
-            .materialHandle = materialHandle
-        };
-
-        model.parts.push_back(part);
-    }
-
-    return model;
+    return sceneHandle;
 }
 
 void ResourceManager::destroy() {
@@ -368,4 +381,5 @@ void ResourceManager::destroy() {
     textures.clear();
     meshAssets.clear();
     materialAssets.clear();
+    sceneAssets.clear();
 }

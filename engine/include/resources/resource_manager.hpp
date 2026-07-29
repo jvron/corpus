@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <sys/types.h>
 #include <unordered_map>
 #include <vector>
 #include <cstdint>
@@ -12,6 +13,8 @@
 struct World;
 
 using ShaderProgram = uint32_t;
+using SceneNodeID = uint32_t;
+using SceneHandle = uint32_t;
 
 enum class ShaderType {
     Vertex,
@@ -91,10 +94,9 @@ struct MaterialAsset {
     float shininess {};
 };
 
-struct ModelOptions {
+struct SceneImportOptions {
     bool storeMeshData {false};
 
-    // affects the whole model 
     ShaderHandle shader {};
 
     Tex2DParameters diffuseParameters;
@@ -103,6 +105,22 @@ struct ModelOptions {
     
     float materialShininess {};
     float materialSpecularStrength {};
+};
+
+struct SceneNode {
+    std::string name;
+
+    std::vector<MaterialHandle> materials {};
+    std::vector<MeshHandle> meshes {};
+
+    std::vector<SceneNodeID> children;
+};
+
+struct SceneAsset {
+    std::string name;
+
+    SceneNodeID root {};
+    std::vector<SceneNode> nodes;
 };
 
 class ResourceManager {
@@ -114,6 +132,10 @@ private:
 
     std::vector<MeshAsset> meshAssets;
     std::vector<MaterialAsset> materialAssets;
+
+    std::vector<SceneAsset> sceneAssets;
+
+    SceneNodeID processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData);
     
 public:
 
@@ -140,7 +162,8 @@ public:
     GPUMesh& getGPUMesh(MeshHandle meshHandle);
 
     Mesh loadMesh(const MeshData& meshData, const std::string& meshName, bool storeMeshData = false);
-    Model loadModel(const std::string& filePath, const ModelOptions& modelOptions);
+
+    SceneHandle loadScene(const std::string& filePath, const SceneImportOptions& options);
 
     void destroy();
 };
