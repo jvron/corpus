@@ -22,7 +22,9 @@ void Engine::registerComponents(World& world) {
     world.registry.registerComponent<PointLight>();
     world.registry.registerComponent<DirectionalLight>();
     world.registry.registerComponent<Spotlight>();
-    world.registry.registerComponent<Model>();
+    world.registry.registerComponent<Parent>();
+    world.registry.registerComponent<Child>();
+
 }
 
 void Engine::startUp(World &world) {
