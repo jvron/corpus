@@ -273,7 +273,6 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& mesh
     meshAssets.push_back(meshAsset);
 
     Mesh mesh = {
-        .name = meshName,
         .handle = meshHandle
     };
 

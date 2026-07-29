@@ -36,7 +36,6 @@ struct Transform {
 };
 
 struct Mesh {  
-    std::string name;
     MeshHandle handle {};
 };
 
