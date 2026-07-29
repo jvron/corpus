@@ -78,7 +78,7 @@ void AssetLoader::freeImage(ImageData& imageData) {
     }
 }
 
-void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal, bool hasTangent) {
+static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal, bool hasTangent) {
 
     VertexAttribute position = {
         .location = AttributeLocation::Position,
@@ -139,7 +139,7 @@ void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool has
     }
 }
 
-MeshData processMesh(const aiMesh& mesh) {
+static MeshData processMesh(const aiMesh& mesh) {
     MeshData meshData;
 
     bool hasColor = mesh.HasVertexColors(0);
@@ -239,7 +239,7 @@ MeshData processMesh(const aiMesh& mesh) {
     return meshData;
 }
 
-void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path& modelDir, aiTextureType aiTexType, TexType texType) {
+static void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path& modelDir, aiTextureType aiTexType, TexType texType) {
 
     size_t textureCount = material.GetTextureCount(aiTexType);
 
@@ -258,7 +258,7 @@ void processTexture(const aiMaterial& material, MaterialImport& materialImport, 
     }
 }
 
-void processMaterials(const aiScene& scene, ModelImport& modelImport, const std::filesystem::path& modelDir) {
+static void processMaterials(const aiScene& scene, ModelImport& modelImport, const std::filesystem::path& modelDir) {
 
     modelImport.materialImports.reserve(scene.mNumMaterials);
 
@@ -284,7 +284,7 @@ void processMaterials(const aiScene& scene, ModelImport& modelImport, const std:
     }
 }
 
-NodeImport processNode(const aiNode& node, const aiScene& scene) {
+static NodeImport processNode(const aiNode& node, const aiScene& scene) {
 
     NodeImport nodeImport;
     nodeImport.name = node.mName.C_Str(); 
