@@ -291,8 +291,11 @@ SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImpo
     for (auto& meshImport : node.meshImports) {
         Mesh mesh = loadMesh(meshImport.meshData, meshImport.name, storeMeshData);
 
-        scene.nodes[nodeID].materials.push_back(materialHandles[meshImport.materialIndex]);
-        scene.nodes[nodeID].meshes.push_back(mesh.handle);
+        MeshRenderer renderer = {
+            .material = materialHandles[meshImport.materialIndex],
+            .mesh = mesh.handle,
+        };
+        scene.nodes[nodeID].renderers.push_back(renderer);
     }
 
     for (size_t i = 0; i < node.children.size(); i++) {

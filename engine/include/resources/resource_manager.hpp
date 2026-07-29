@@ -107,12 +107,14 @@ struct SceneImportOptions {
     float materialSpecularStrength {};
 };
 
+struct MeshRenderer {
+    MaterialHandle material;
+    MeshHandle mesh;
+};
+
 struct SceneNode {
     std::string name;
-
-    std::vector<MaterialHandle> materials {};
-    std::vector<MeshHandle> meshes {};
-
+    std::vector<MeshRenderer> renderers;
     std::vector<SceneNodeID> children;
 };
 
