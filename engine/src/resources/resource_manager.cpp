@@ -306,12 +306,12 @@ SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImpo
 
 SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneImportOptions& options)
 {
-    ModelImport modelImport = AssetLoader::loadModel(filePath);
+    SceneImport sceneImport = AssetLoader::loadScene(filePath);
 
     std::vector<MaterialHandle> materialHandles;
-    materialHandles.reserve(modelImport.materialImports.size());
+    materialHandles.reserve(sceneImport.materialImports.size());
 
-    for (const auto& materialImport : modelImport.materialImports) {
+    for (const auto& materialImport : sceneImport.materialImports) {
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
@@ -353,8 +353,8 @@ SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneI
     }
 
     SceneAsset sceneAsset;
-    sceneAsset.name = modelImport.name;
-    sceneAsset.root = processNodeImport(sceneAsset, modelImport.root, materialHandles, options.storeMeshData);
+    sceneAsset.name = sceneImport.name;
+    sceneAsset.root = processNodeImport(sceneAsset, sceneImport.root, materialHandles, options.storeMeshData);
 
     SceneHandle sceneHandle = sceneAssets.size();
     sceneAssets.push_back(std::move(sceneAsset));
