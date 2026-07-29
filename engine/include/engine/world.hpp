@@ -3,6 +3,7 @@
 #include "ecs/components.hpp"
 #include "resources/resource_manager.hpp"
 #include "ecs/registry.hpp"
+#include "scene/scene_manager.hpp"
 
 constexpr int32_t keyCount = 348; 
 
@@ -78,6 +79,9 @@ struct World {
 
     Registry registry;
     ResourceManager resourceManager;
+    SceneManager sceneManager;
 
     Entity activeCamera;
+
+    World() : sceneManager(SceneManager(registry, resourceManager)) {}
 };
