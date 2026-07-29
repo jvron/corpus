@@ -227,7 +227,7 @@ MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) 
 
 MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
 
-    assert(!(meshHandle >= meshAssets.size()) && "Error: MeshAsset does not exist");
+    assert(!(meshHandle >= meshAssets.size()) && "[ERROR]: MeshAsset does not exist");
     return meshAssets[meshHandle];
 }   
 
@@ -254,7 +254,7 @@ GPUMesh ResourceManager::buildGPUMesh(const MeshData& meshData) {
 
 GPUMesh& ResourceManager::getGPUMesh(MeshHandle meshHandle) {
 
-    assert(!(meshHandle >= meshAssets.size()) && "Error: GPUMesh does not exist");
+    assert(!(meshHandle >= meshAssets.size()) && "[ERROR]: GPUMesh does not exist");
 
     return meshAssets[meshHandle].gpuMesh; 
 }
@@ -304,8 +304,7 @@ SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImpo
     return nodeID;
 }
 
-SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneImportOptions& options)
-{
+SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneImportOptions& options) {
     SceneImport sceneImport = AssetLoader::loadScene(filePath);
 
     std::vector<MaterialHandle> materialHandles;
@@ -360,6 +359,13 @@ SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneI
     sceneAssets.push_back(std::move(sceneAsset));
 
     return sceneHandle;
+}
+
+SceneAsset& ResourceManager::getSceneAsset(SceneHandle sceneHandle) {
+
+    assert(sceneHandle < sceneAssets.size() && "[ERROR]: SceneAsset does not exist");
+
+    return sceneAssets[sceneHandle];
 }
 
 void ResourceManager::destroy() {

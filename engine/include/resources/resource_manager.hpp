@@ -164,6 +164,7 @@ public:
     Mesh loadMesh(const MeshData& meshData, const std::string& meshName, bool storeMeshData = false);
 
     SceneHandle loadScene(const std::string& filePath, const SceneImportOptions& options);
+    SceneAsset& getSceneAsset(SceneHandle sceneHande);
 
     void destroy();
 };
