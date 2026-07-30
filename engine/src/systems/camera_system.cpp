@@ -6,7 +6,6 @@
 #include "ecs/components.hpp"
 #include "engine/systems.hpp"
 
-
 void CameraSystem::updateView(Camera& camera, glm::mat4& view) {
 
     view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);

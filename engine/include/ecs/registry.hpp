@@ -11,16 +11,7 @@
 
 class Registry {
 
-private:
-    static inline int typeCounter = 0;
-    std::vector<SparseSet> pools;
-
-    //index = EntityID
-    std::vector<uint32_t> generations;
-    std::vector<EntityID> freeEntityIDs; 
-
 public:
-
     Entity createEntity();
     bool isValidEntity(Entity entity);
     void destroyEntity(Entity entity);
@@ -112,4 +103,12 @@ public:
 
         (remove<T>(entity), ...);
     }
+    
+private:
+    static inline int typeCounter = 0;
+    std::vector<SparseSet> pools;
+
+    //index = EntityID
+    std::vector<uint32_t> generations;
+    std::vector<EntityID> freeEntityIDs; 
 };

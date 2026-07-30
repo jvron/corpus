@@ -5,7 +5,6 @@
 
 void Scheduler::init(World &world) {
     worldHandle = &world;
-
 }
 
 void Scheduler::runStage(Stage stage) {

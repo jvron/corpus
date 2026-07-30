@@ -22,12 +22,12 @@ enum class Stage{
 
 class Scheduler {
 
-private:
-    World *worldHandle = nullptr;
-    std::unordered_map<Stage, Schedule> pipeline;
-
 public:
     void init(World &world);
     void runStage(Stage stage);
     void addSystem(Stage stage, systemFn sys);
+
+private:
+    World *worldHandle = nullptr;
+    std::unordered_map<Stage, Schedule> pipeline;
 };

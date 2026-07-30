@@ -11,13 +11,7 @@
 template <typename ... Component>
 class View {
 
-private:
-    std::array<SparseSet*, sizeof...(Component)> poolPtrs;
-    Registry& registryRef;
-    SparseSet& leaderPool;
-
 public:
-
     View(Registry &registry) : poolPtrs{registry.getPool<Component>()...}, registryRef(registry), leaderPool(getLeaderPool()) {};
 
     SparseSet& getLeaderPool() {
@@ -36,6 +30,26 @@ public:
 
     class Iterator {
 
+    public:
+        Iterator(View& v, SparseSet& p, uint32_t i) : view(v), pool(p), index(i) {
+            validateOrAdvance();
+        }
+
+        std::tuple<Entity, Component& ...> operator*() {
+            Entity entity = pool.denseEntities[index];
+            return {entity, view.registryRef.template getComponentUnsafe<Component>(entity) ...} ;
+        }
+
+        bool operator!=(const Iterator& other) {
+            return index != other.index;
+        }
+
+        Iterator& operator++() {
+            index++;
+            validateOrAdvance();
+            return *this;
+        }
+        
     private:
         View& view;
         SparseSet& pool;
@@ -65,27 +79,6 @@ public:
                 index++;
             }
         }
-
-    public:
-
-        Iterator(View& v, SparseSet& p, uint32_t i) : view(v), pool(p), index(i) {
-            validateOrAdvance();
-        }
-
-        std::tuple<Entity, Component& ...> operator*() {
-            Entity entity = pool.denseEntities[index];
-            return {entity, view.registryRef.template getComponentUnsafe<Component>(entity) ...} ;
-        }
-
-        bool operator!=(const Iterator& other) {
-            return index != other.index;
-        }
-
-        Iterator& operator++() {
-            index++;
-            validateOrAdvance();
-            return *this;
-        }
     };
 
     Iterator begin() {
@@ -95,4 +88,9 @@ public:
     Iterator end() {
         return Iterator(*this, leaderPool, leaderPool.size());
     }
+
+private:
+    std::array<SparseSet*, sizeof...(Component)> poolPtrs;
+    Registry& registryRef;
+    SparseSet& leaderPool;
 };

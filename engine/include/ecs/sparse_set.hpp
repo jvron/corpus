@@ -5,12 +5,10 @@
 
 #include "ecs/components.hpp"
 
-constexpr int maxEntities = 100;
+constexpr int maxEntities = 1024;
 //constexpr size_t pageSize = 1024;
 
 class SparseSet {
-
-private:
 
 public:
     size_t componentSize; //stride

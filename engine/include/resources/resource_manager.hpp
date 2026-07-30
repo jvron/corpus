@@ -127,20 +127,7 @@ struct SceneAsset {
 
 class ResourceManager {
 
-private:
-    std::vector<ShaderProgram> shaderPrograms;
-    std::vector<ShaderAsset> shaderAssets;
-    std::vector<Texture> textures;
-
-    std::vector<MeshAsset> meshAssets;
-    std::vector<MaterialAsset> materialAssets;
-
-    std::vector<SceneAsset> sceneAssets;
-
-    SceneNodeID processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData);
-    
 public:
-
     void init();
 
     ShaderHandle createShaderProgram(const std::vector<std::string>& shaderPaths);
@@ -169,4 +156,16 @@ public:
     SceneAsset& getSceneAsset(SceneHandle sceneHande);
 
     void destroy();
+
+private:
+    std::vector<ShaderProgram> shaderPrograms;
+    std::vector<ShaderAsset> shaderAssets;
+    std::vector<Texture> textures;
+
+    std::vector<MeshAsset> meshAssets;
+    std::vector<MaterialAsset> materialAssets;
+
+    std::vector<SceneAsset> sceneAssets;
+
+    SceneNodeID processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData);
 };
