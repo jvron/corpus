@@ -12,6 +12,7 @@
 #include "resources/resource_manager.hpp"
 
 void Engine::registerComponents(World& world) {
+    
     world.registry.registerComponent<Mesh>();
     world.registry.registerComponent<Material>();
     world.registry.registerComponent<Color>();
@@ -24,7 +25,7 @@ void Engine::registerComponents(World& world) {
     world.registry.registerComponent<Spotlight>();
     world.registry.registerComponent<Parent>();
     world.registry.registerComponent<Child>();
-
+    world.registry.registerComponent<WorldTransform>();
 }
 
 void Engine::startUp(World &world) {

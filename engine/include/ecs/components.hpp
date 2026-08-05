@@ -2,9 +2,9 @@
  
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include <cstdint>
 #include <vector>
-#include <string>
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
@@ -33,6 +33,10 @@ struct Transform {
     glm::vec3 position {0.0f};
     glm::vec3 scale {1.0f};
     glm::vec3 rotation {0.0f};  
+};
+
+struct WorldTransform {
+    glm::mat4 matrix {};
 };
 
 struct Mesh {  
