@@ -1,4 +1,3 @@
-
 #include "scene/scene_manager.hpp"
 #include "ecs/components.hpp"
 #include "resources/resource_manager.hpp"
@@ -11,7 +10,7 @@ Entity SceneManager::processSceneNode(Entity& parentEntity, const SceneAsset& sc
     Child child = {
         .parent = parentEntity
     };
-    registry.insert(nodeEntity, child);
+    registry.insertComponents(nodeEntity, child, node.localTransform, WorldTransform());
 
     // nodeEntity owns its mesh entities and child node entities.
     Parent parentNode; 
@@ -30,7 +29,7 @@ Entity SceneManager::processSceneNode(Entity& parentEntity, const SceneAsset& sc
             .handle = renderer.material
         };
 
-        registry.insertComponents(meshEntity, material, mesh, child); 
+        registry.insertComponents(meshEntity, material, mesh, child, Transform(), WorldTransform(), Renderable()); 
 
         parentNode.children.push_back(meshEntity);
     }
@@ -52,13 +51,13 @@ Entity SceneManager::instantiate(SceneHandle sceneHandle) {
 
     Entity root = registry.createEntity();
 
-    const SceneAsset& scene = resourceManager.getSceneAsset(sceneHandle);
+    const SceneAsset& sceneAsset = resourceManager.getSceneAsset(sceneHandle);
 
-    Entity sceneNode = processSceneNode(root, scene, scene.nodes[scene.root]);
+    Entity scene = processSceneNode(root, sceneAsset, sceneAsset.nodes[sceneAsset.root]);
 
-    Parent parent; 
-    parent.children.push_back(sceneNode);
-    registry.insert(root, parent);
+    Parent parent;
+    parent.children.push_back(scene);
+    registry.insertComponents(root, parent, Transform(), WorldTransform());
 
     return root;
 }
