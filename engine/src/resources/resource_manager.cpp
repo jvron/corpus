@@ -31,7 +31,7 @@ void ResourceManager::init() {
 
     uint8_t whitePixels[] = {255, 255, 255, 255};
   
-    ImageData whiteImageData = {
+    ImageData whiteImageData {
         .width = 1,
         .height = 1,
         .data = whitePixels,
@@ -41,7 +41,7 @@ void ResourceManager::init() {
 
     uint8_t blackPixels[] = {0, 0, 0, 0};
 
-    ImageData blackImageData = {
+    ImageData blackImageData {
         .width = 1,
         .height = 1,
         .data = blackPixels,
@@ -51,7 +51,7 @@ void ResourceManager::init() {
 
     uint8_t normalPixels[] = {128, 128, 255, 255};
 
-    ImageData normalImageData = {
+    ImageData normalImageData {
         .width = 1,
         .height = 1,
         .data = normalPixels,
@@ -134,9 +134,9 @@ ShaderAsset& ResourceManager::getShaderAsset(ShaderHandle shaderHandle) {
 
 void ResourceManager::setUniformLocation(ShaderHandle shaderHandle, const std::string& uniformName) {
 
-    ShaderAsset& shaderAsset =  getShaderAsset(shaderHandle);
+    ShaderAsset& shaderAsset = getShaderAsset(shaderHandle);
 
-    if (shaderAsset.uniformLocations.find(uniformName) == shaderAsset.uniformLocations.end()) {
+    if (!shaderAsset.uniformLocations.contains(uniformName)) {
         GLuint location = GLBackend::getUniformLocation(shaderAsset.shaderProgram, uniformName);
         //std::cerr << "[DEBUG]: Uniform name: " << uniformName << ", location: " << location << "\n";
         shaderAsset.uniformLocations[uniformName] = location;
@@ -212,7 +212,7 @@ Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
     MaterialHandle handle = materialAssets.size();
     materialAssets.push_back(materialAsset);
 
-    Material material = {
+    Material material {
         .handle = handle
     };
     return material;
@@ -266,13 +266,13 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& mesh
     meshAsset.gpuMesh = buildGPUMesh(meshData);
 
     if (storeMeshData) {
-        meshAsset.meshData = meshData;
+        meshAsset.meshData = std::move(meshData);
     }
 
     const MeshHandle meshHandle = meshAssets.size();
     meshAssets.push_back(meshAsset);
 
-    Mesh mesh = {
+    Mesh mesh {
         .handle = meshHandle
     };
 
@@ -283,11 +283,12 @@ SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImpo
 
     SceneNode sceneNode;
     sceneNode.name = node.name;
+    sceneNode.localTransform = node.localTransform;
 
     SceneNodeID nodeID = scene.nodes.size();
     scene.nodes.push_back(sceneNode);
 
-    for (auto& meshImport : node.meshImports) {
+    for (const auto& meshImport : node.meshImports) {
         Mesh mesh = loadMesh(meshImport.meshData, meshImport.name, storeMeshData);
 
         MeshRenderer renderer = {

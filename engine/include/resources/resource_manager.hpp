@@ -114,6 +114,7 @@ struct MeshRenderer {
 
 struct SceneNode {
     std::string name;
+    Transform localTransform;
     std::vector<MeshRenderer> renderers;
     std::vector<SceneNodeID> children;
 };
