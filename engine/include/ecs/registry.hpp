@@ -16,8 +16,8 @@ public:
     bool isValidEntity(Entity entity);
     void destroyEntity(Entity entity);
 
-    template<typename T>
-    static uint32_t getId() { //unique type id for each component type, a new function is created for each component type
+    template<typename T> //unique type id for each component type, a new function is created for each component type
+    static uint32_t getId() {
         static uint32_t typeId = typeCounter++; //typeCounter is only incremented once (first function call)
         return typeId;
     }
@@ -82,7 +82,7 @@ public:
     template <typename ... T>
     void insertComponents(Entity entity, const T&... components) {
 
-        static_assert(sizeof...(T) > 0, "Must provide atleast one component");
+        static_assert(sizeof...(T) > 0, "[ERROR]: Must provide atleast one component");
 
         (insert(entity, components), ...);
     }
@@ -99,9 +99,18 @@ public:
     template <typename ...T> 
     void removeComponents(Entity entity) {
 
-        static_assert(sizeof...(T) > 0, "Must provide atleast one component");
+        static_assert(sizeof...(T) > 0, "[ERROR]: Must provide atleast one component");
 
         (remove<T>(entity), ...);
+    }
+
+    template<typename  T> 
+    bool hasComponent(Entity entity) {
+
+        const SparseSet* pool = getPool<T>();
+        assert(pool && "[ERROR]: Requested pool does not exist");
+        
+        return pool->hasEntity(entity);
     }
     
 private:
