@@ -103,23 +103,9 @@ GPUCameraBlock Renderer::gatherCameraData(World &world) {
     return cameraData;
 }
 
-glm::mat4 Renderer::getModelMatrix(const Transform& transform) {
+void Renderer::renderMeshes(World& world) {
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, transform.position);
-    model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, transform.scale);
-
-    //Model = T * R * S 
-
-    return model;
-}
-
-void Renderer::drawMesh(World& world) {
-
-    for (auto [entity, mesh, material, renderable, transform] : View<Mesh, Material, Renderable, Transform>(world.registry)) {
+    for (auto [entity, mesh, material, renderable, worldTransform] : View<Mesh, Material, Renderable, WorldTransform>(world.registry)) {
 
         if (!renderable.visible) {
             continue;
@@ -138,7 +124,7 @@ void Renderer::drawMesh(World& world) {
         const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
         GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
 
-        glm::mat4 modelMatrix = getModelMatrix(transform);
+        glm::mat4 modelMatrix = worldTransform.matrix;
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
         
         GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], materialAsset.baseColor);
@@ -147,44 +133,6 @@ void Renderer::drawMesh(World& world) {
 
         const GPUMesh& gpuMesh = world.resourceManager.getGPUMesh(mesh.handle);
         GLBackend::drawIndexed(gpuMesh, shaderAsset.shaderProgram);
-    }
-}
-
-void Renderer::drawModel(World &world) {
-
-    ResourceManager& resourceManager = world.resourceManager;
-
-    for (auto [entity, model, renderable, transform] : View<Model, Renderable, Transform>(world.registry)) {
-
-        if (!renderable.visible) {
-            continue;
-        }
-
-        for (auto part : model.parts) {
-
-            const MeshAsset& meshAsset = resourceManager.getMeshAsset(part.meshHandle);
-            const MaterialAsset& materialAsset = resourceManager.getMaterialAsset(part.materialHandle);
-
-            ShaderAsset& shaderAsset = world.resourceManager.getShaderAsset(materialAsset.shaderHandle);
-
-            const Texture& diffuseMap = world.resourceManager.getTexture(materialAsset.diffuseMap);
-            GLBackend::bindTextureUnit(diffuseMap.id, TextureUnit::DiffuseMap);
-
-            const Texture& specularMap = world.resourceManager.getTexture(materialAsset.specularMap);
-            GLBackend::bindTextureUnit(specularMap.id, TextureUnit::SpecularMap);
-     
-            const Texture& normalMap = world.resourceManager.getTexture(materialAsset.normalMap);
-            GLBackend::bindTextureUnit(normalMap.id, TextureUnit::NormalMap);
-
-            glm::mat4 modelMatrix = getModelMatrix(transform);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uModel"], modelMatrix);
-            
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uColor"], materialAsset.baseColor);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uSpecularStrength"], materialAsset.specularStrength);
-            GLBackend::setUniform(shaderAsset.shaderProgram, shaderAsset.uniformLocations["uShininess"], materialAsset.shininess);
-        
-            GLBackend::drawIndexed(meshAsset.gpuMesh, shaderAsset.shaderProgram);
-        }
     }
 }
 
@@ -201,6 +149,5 @@ void Renderer::beginFrame(World &world) {
 
 void Renderer::renderScene(World &world) {
 
-    drawMesh(world);
-    drawModel(world);
+    renderMeshes(world);
 }

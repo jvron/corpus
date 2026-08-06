@@ -77,10 +77,7 @@ namespace Renderer {
     GPULightBlock gatherLightData(World& world);
     GPUCameraBlock gatherCameraData(World& world);
 
-    glm::mat4 getModelMatrix(const Transform& transform);
-
-    void drawMesh(World& world);
-    void drawModel(World& world);
+    void renderMeshes(World& world);
 
     void beginFrame(World& world);
     void renderScene(World& world);
