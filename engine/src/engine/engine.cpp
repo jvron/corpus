@@ -44,7 +44,7 @@ void Engine::startUp(World &world) {
 
     scheduler.addSystem(Stage::Update, CameraControlSystem::update);
     scheduler.addSystem(Stage::Update, TransformSystem::update);
-    
+
     scheduler.addSystem(Stage::Render, Renderer::beginFrame);
     scheduler.addSystem(Stage::Render, Renderer::renderScene);
 
@@ -52,17 +52,22 @@ void Engine::startUp(World &world) {
     scheduler.addSystem(Stage::End, Input::resetInputState);
 }
 
+void Engine::runFrame(World& world) {
+
+    Clock::tick(world);
+
+    scheduler.runStage(Stage::Begin);
+    scheduler.runStage(Stage::Input);
+    scheduler.runStage(Stage::Update);
+    scheduler.runStage(Stage::Render);
+    scheduler.runStage(Stage::End);
+};
+
 void Engine::run(World &world) {
 
     while (!Window::shouldClose(world)) {
-
-        Clock::tick(world);
-
-        scheduler.runStage(Stage::Begin);
-        scheduler.runStage(Stage::Input);
-        scheduler.runStage(Stage::Update);
-        scheduler.runStage(Stage::Render);
-        scheduler.runStage(Stage::End);
+        
+        runFrame(world);
     }
 }
 

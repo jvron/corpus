@@ -7,6 +7,7 @@ class Engine {
 
 public:
     void startUp(World &world);
+    void runFrame(World& world);
     void run(World &world);
     void shutDown(World &world);
 
