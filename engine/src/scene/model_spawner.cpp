@@ -31,7 +31,7 @@ Entity ModelSpawner::processModelNode(Entity& parentEntity, const ModelAsset& mo
 
         registry.insertComponents(meshEntity, material, mesh, child, Transform(), WorldTransform(), Renderable()); 
 
-        parentNode.children.push_back(meshEntity);
+        parentNode.children[parentNode.count++] = meshEntity;
     }
 
     for (ModelNodeID childNodeID : node.children) {
@@ -39,7 +39,7 @@ Entity ModelSpawner::processModelNode(Entity& parentEntity, const ModelAsset& mo
         const ModelNode& childNode = model.nodes[childNodeID];
 
         Entity childEntity = processModelNode(nodeEntity, model, childNode);
-        parentNode.children.push_back(childEntity);
+        parentNode.children[parentNode.count++] = childEntity;
     }
 
     registry.insert(nodeEntity, parentNode);
@@ -56,7 +56,7 @@ Entity ModelSpawner::instantiate(ModelHandle modelHandle) {
     Entity model = processModelNode(root, modelAsset, modelAsset.nodes[modelAsset.root]);
 
     Parent parent;
-    parent.children.push_back(model);
+    parent.children[parent.count++] = model;
     registry.insertComponents(root, parent, Transform(), WorldTransform());
 
     return root;

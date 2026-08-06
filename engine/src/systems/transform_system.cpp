@@ -22,7 +22,7 @@ glm::mat4 TransformSystem::getLocalMatrix(const Transform& transform) {
 }
 
 void TransformSystem::updateWorldMatrix(Entity entity, const glm::mat4& parentWorld, Registry& registry) {
-
+        
     Transform& localTransform = registry.getComponent<Transform>(entity);
     glm::mat4 localMatrix = getLocalMatrix(localTransform);
 
@@ -36,9 +36,9 @@ void TransformSystem::updateWorldMatrix(Entity entity, const glm::mat4& parentWo
 
         Parent& parent = registry.getComponent<Parent>(entity);
 
-        for (const Entity child_entity : parent.children) {
+        for (uint32_t i = 0; i < parent.count; i++) {
 
-            updateWorldMatrix(child_entity, thisWorld, registry);
+            updateWorldMatrix(parent.children[i], thisWorld, registry);
         }
     }
 }

@@ -4,7 +4,6 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <cstdint>
-#include <vector>
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
@@ -18,7 +17,8 @@ struct Entity {
 };
 
 struct Parent {
-    std::vector<Entity> children;
+    std::array<Entity, 128> children;
+    uint32_t count {};
 };
 
 struct Child {
