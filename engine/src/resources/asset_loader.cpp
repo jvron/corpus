@@ -1,3 +1,4 @@
+#include "assimp/matrix4x4.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -289,6 +290,30 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
     NodeImport nodeImport;
     nodeImport.name = node.mName.C_Str(); 
 
+    aiVector3D scale;
+    aiVector3D rotation;
+    aiVector3D position;
+
+    node.mTransformation.Decompose(scale, rotation, position);
+
+    nodeImport.localTransform.scale = {
+        scale.x,
+        scale.y,
+        scale.z 
+    };
+
+    nodeImport.localTransform.rotation = {
+        rotation.x,
+        rotation.y,
+        rotation.z,
+    };
+
+    nodeImport.localTransform.position = {
+        position.x,
+        position.y,
+        position.z
+    };
+
     for (size_t i = 0; i < node.mNumMeshes; i++) {
 
         const aiMesh* mesh =  scene.mMeshes[node.mMeshes[i]];
@@ -298,8 +323,9 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
         if (name.empty()) {
             name = "Mesh_" + std::to_string(nodeImport.meshImports.size());
         }
+        
 
-        MeshImport meshImport = {
+        MeshImport meshImport {
             .name = std::move(name),
             .meshData = processMesh(*mesh),
             .materialIndex = mesh->mMaterialIndex

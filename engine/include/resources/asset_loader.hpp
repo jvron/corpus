@@ -8,6 +8,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include "ecs/components.hpp"
+
 enum class TexFormat {
     Red,
     Rg,
@@ -92,6 +94,7 @@ struct MaterialImport {
 
 struct NodeImport {
     std::string name;
+    Transform localTransform;
     std::vector<MeshImport> meshImports;
     std::vector<std::unique_ptr<NodeImport>> children;
 };
