@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <vector>
 
 #include "engine/scheduler.hpp"
@@ -9,11 +10,13 @@ void Scheduler::init(World &world) {
  
 void Scheduler::runStage(Stage stage) {
     
-    for (auto sys : pipeline.at(stage).systems) {
+    const Schedule& shedule = pipeline[static_cast<size_t>(stage)];
+    for (auto sys : shedule.systems) {
         sys(*worldHandle);
     }
 }
 
 void Scheduler::addSystem(Stage stage, systemFn sys) {
-    pipeline[stage].systems.push_back(sys);
+
+    pipeline[static_cast<size_t>(stage)].systems.push_back(sys);
 }

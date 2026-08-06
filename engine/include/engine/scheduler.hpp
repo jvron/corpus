@@ -1,9 +1,11 @@
 #pragma once 
 
-#include <unordered_map>
+#include <cstddef>
 #include <vector>
 
 #include "engine/world.hpp"
+
+constexpr size_t StageCount = 5;
 
 using systemFn = void (*)(World &world);
 
@@ -29,5 +31,5 @@ public:
 
 private:
     World *worldHandle = nullptr;
-    std::unordered_map<Stage, Schedule> pipeline;
+    std::array<Schedule, StageCount> pipeline;
 };
