@@ -99,7 +99,7 @@ struct NodeImport {
     std::vector<std::unique_ptr<NodeImport>> children;
 };
 
-struct SceneImport {
+struct ModelImport {
     std::string name;
     NodeImport root;
     std::vector<MaterialImport> materialImports;
@@ -111,5 +111,5 @@ namespace AssetLoader  {
     ImageData loadImage(const std::string& filePath);
     void freeImage(ImageData& imageData);
 
-    SceneImport loadScene(const std::string& filePath);
+    ModelImport loadModel(const std::string& filePath);
 }

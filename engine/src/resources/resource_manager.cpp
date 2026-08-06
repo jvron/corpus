@@ -279,14 +279,14 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& mesh
     return mesh;
 }
 
-SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData) {
+ModelNodeID ResourceManager::processNodeImport(ModelAsset& model, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData) {
 
-    SceneNode sceneNode;
-    sceneNode.name = node.name;
-    sceneNode.localTransform = node.localTransform;
+    ModelNode modelNode;
+    modelNode.name = node.name;
+    modelNode.localTransform = node.localTransform;
 
-    SceneNodeID nodeID = scene.nodes.size();
-    scene.nodes.push_back(sceneNode);
+    ModelNodeID nodeID = model.nodes.size();
+    model.nodes.push_back(modelNode);
 
     for (const auto& meshImport : node.meshImports) {
         Mesh mesh = loadMesh(meshImport.meshData, meshImport.name, storeMeshData);
@@ -295,25 +295,26 @@ SceneNodeID ResourceManager::processNodeImport(SceneAsset& scene, const NodeImpo
             .material = materialHandles[meshImport.materialIndex],
             .mesh = mesh.handle,
         };
-        scene.nodes[nodeID].renderers.push_back(renderer);
+        model.nodes[nodeID].renderers.push_back(renderer);
     }
 
     for (size_t i = 0; i < node.children.size(); i++) {
 
-        SceneNodeID childID = processNodeImport(scene, *node.children[i], materialHandles, storeMeshData);
-        scene.nodes[nodeID].children.push_back(childID);
+        ModelNodeID childID = processNodeImport(model, *node.children[i], materialHandles, storeMeshData);
+        model.nodes[nodeID].children.push_back(childID);
     }
 
     return nodeID;
 }
 
-SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneImportOptions& options) {
-    SceneImport sceneImport = AssetLoader::loadScene(filePath);
+ModelHandle ResourceManager::loadModel(const std::string& filePath, const ModelImportOptions& options) {
+
+    ModelImport modelImport = AssetLoader::loadModel(filePath);
 
     std::vector<MaterialHandle> materialHandles;
-    materialHandles.reserve(sceneImport.materialImports.size());
+    materialHandles.reserve(modelImport.materialImports.size());
 
-    for (const auto& materialImport : sceneImport.materialImports) {
+    for (const auto& materialImport : modelImport.materialImports) {
 
         MaterialAsset materialAsset;
         materialAsset.name = materialImport.name;
@@ -354,21 +355,21 @@ SceneHandle ResourceManager::loadScene(const std::string& filePath, const SceneI
         materialHandles.push_back(material.handle);
     }
 
-    SceneAsset sceneAsset;
-    sceneAsset.name = sceneImport.name;
-    sceneAsset.root = processNodeImport(sceneAsset, sceneImport.root, materialHandles, options.storeMeshData);
+    ModelAsset modelAsset;
+    modelAsset.name = modelImport.name;
+    modelAsset.root = processNodeImport(modelAsset, modelImport.root, materialHandles, options.storeMeshData);
 
-    SceneHandle sceneHandle = sceneAssets.size();
-    sceneAssets.push_back(std::move(sceneAsset));
+    ModelHandle modelHandle = modelAssets.size();
+    modelAssets.push_back(std::move(modelAsset));
 
-    return sceneHandle;
+    return modelHandle;
 }
 
-SceneAsset& ResourceManager::getSceneAsset(SceneHandle sceneHandle) {
+ModelAsset& ResourceManager::getModelAsset(ModelHandle modelHandle) {
 
-    assert(sceneHandle < sceneAssets.size() && "[ERROR]: SceneAsset does not exist");
+    assert(modelHandle < modelAssets.size() && "[ERROR]: modelAsset does not exist");
 
-    return sceneAssets[sceneHandle];
+    return modelAssets[modelHandle];
 }
 
 void ResourceManager::destroy() {
@@ -390,5 +391,5 @@ void ResourceManager::destroy() {
     textures.clear();
     meshAssets.clear();
     materialAssets.clear();
-    sceneAssets.clear();
+    modelAssets.clear();
 }

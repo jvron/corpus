@@ -13,8 +13,8 @@
 struct World;
 
 using ShaderProgram = uint32_t;
-using SceneNodeID = uint32_t;
-using SceneHandle = uint32_t;
+using ModelNodeID = uint32_t;
+using ModelHandle = uint32_t;
 
 enum class ShaderType {
     Vertex,
@@ -94,7 +94,7 @@ struct MaterialAsset {
     float shininess {};
 };
 
-struct SceneImportOptions {
+struct ModelImportOptions {
     bool storeMeshData {false};
 
     ShaderHandle shader {};
@@ -112,18 +112,18 @@ struct MeshRenderer {
     MeshHandle mesh;
 };
 
-struct SceneNode {
+struct ModelNode {
     std::string name;
     Transform localTransform;
     std::vector<MeshRenderer> renderers;
-    std::vector<SceneNodeID> children;
+    std::vector<ModelNodeID> children;
 };
 
-struct SceneAsset {
+struct ModelAsset {
     std::string name;
 
-    SceneNodeID root {};
-    std::vector<SceneNode> nodes;
+    ModelNodeID root {};
+    std::vector<ModelNode> nodes;
 };
 
 class ResourceManager {
@@ -153,8 +153,8 @@ public:
 
     Mesh loadMesh(const MeshData& meshData, const std::string& meshName, bool storeMeshData = false);
 
-    SceneHandle loadScene(const std::string& filePath, const SceneImportOptions& options);
-    SceneAsset& getSceneAsset(SceneHandle sceneHande);
+    ModelHandle loadModel(const std::string& filePath, const ModelImportOptions& options);
+    ModelAsset& getModelAsset(ModelHandle modelHande);
 
     void destroy();
 
@@ -166,7 +166,7 @@ private:
     std::vector<MeshAsset> meshAssets;
     std::vector<MaterialAsset> materialAssets;
 
-    std::vector<SceneAsset> sceneAssets;
+    std::vector<ModelAsset> modelAssets;
 
-    SceneNodeID processNodeImport(SceneAsset& scene, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData);
+    ModelNodeID processNodeImport(ModelAsset& model, const NodeImport& node, const std::vector<MaterialHandle>& materialHandles, bool storeMeshData);
 };

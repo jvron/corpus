@@ -259,9 +259,9 @@ static void processTexture(const aiMaterial& material, MaterialImport& materialI
     }
 }
 
-static void processMaterials(const aiScene& scene, SceneImport& sceneImport, const std::filesystem::path& modelDir) {
+static void processMaterials(const aiScene& scene, ModelImport& modelImport, const std::filesystem::path& modelDir) {
 
-    sceneImport.materialImports.reserve(scene.mNumMaterials);
+    modelImport.materialImports.reserve(scene.mNumMaterials);
 
     for (size_t i = 0; i < scene.mNumMaterials; i++) {
         const aiMaterial* material = scene.mMaterials[i];
@@ -281,7 +281,7 @@ static void processMaterials(const aiScene& scene, SceneImport& sceneImport, con
         processTexture(*material, materialImport, modelDir, aiTextureType_NORMALS, TexType::NormalMap);
         processTexture(*material, materialImport, modelDir, aiTextureType_HEIGHT, TexType::NormalMap);
 
-        sceneImport.materialImports.push_back(std::move(materialImport));
+        modelImport.materialImports.push_back(std::move(materialImport));
     }
 }
 
@@ -344,11 +344,11 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
     return nodeImport;
 }
 
-SceneImport AssetLoader::loadScene(const std::string& filePath) {
+ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
     constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs;
 
-    SceneImport sceneImport;
+    ModelImport modelImport;
 
     Assimp::Importer importer;
 
@@ -356,17 +356,17 @@ SceneImport AssetLoader::loadScene(const std::string& filePath) {
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cerr << "[ERROR](Assimp): " << importer.GetErrorString() << "\n";
-        return sceneImport;
+        return modelImport;
     }
 
     std::filesystem::path path = filePath;
-    sceneImport.name = path.stem().string();
+    modelImport.name = path.stem().string();
 
     std::filesystem::path modelDir = path.parent_path();
 
-    processMaterials(*scene, sceneImport, modelDir);
+    processMaterials(*scene, modelImport, modelDir);
 
-    sceneImport.root = processNode(*scene->mRootNode, *scene);
+    modelImport.root = processNode(*scene->mRootNode, *scene);
 
-    return sceneImport;
+    return modelImport;
 }
