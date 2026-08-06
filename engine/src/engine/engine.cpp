@@ -41,11 +41,15 @@ void Engine::startUp(World &world) {
     registerComponents(world);
 
     scheduler.addSystem(Stage::Begin, Window::pollEvents);
+
     scheduler.addSystem(Stage::Update, CameraControlSystem::update);
-    scheduler.addSystem(Stage::Update, Input::resetInputState);
+    scheduler.addSystem(Stage::Update, TransformSystem::update);
+    
     scheduler.addSystem(Stage::Render, Renderer::beginFrame);
     scheduler.addSystem(Stage::Render, Renderer::renderScene);
+
     scheduler.addSystem(Stage::End, Window::swapBuffers);
+    scheduler.addSystem(Stage::End, Input::resetInputState);
 }
 
 void Engine::run(World &world) {
