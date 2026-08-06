@@ -4,17 +4,17 @@
 #include "ecs/registry.hpp"
 #include "resources/resource_manager.hpp"
 
-class SceneManager {
+class ModelSpawner {
 
 public:
-    SceneManager(Registry& registry, ResourceManager& resourceManager) : 
+    ModelSpawner(Registry& registry, ResourceManager& resourceManager) : 
         registry(registry), resourceManager(resourceManager) {} 
 
-    Entity instantiate(SceneHandle sceneHandle);
+    Entity instantiate(ModelHandle modelHandle);
 
 private:
     Registry& registry;
     ResourceManager& resourceManager;
 
-    Entity processSceneNode(Entity& parent, const SceneAsset& scene, const SceneNode& node);
+    Entity processModelNode(Entity& parent, const ModelAsset& model, const ModelNode& node);
 };

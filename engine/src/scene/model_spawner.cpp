@@ -1,8 +1,8 @@
-#include "scene/scene_manager.hpp"
 #include "ecs/components.hpp"
+#include "scene/model_spawner.hpp"
 #include "resources/resource_manager.hpp"
 
-Entity SceneManager::processSceneNode(Entity& parentEntity, const SceneAsset& scene, const SceneNode& node) {
+Entity ModelSpawner::processModelNode(Entity& parentEntity, const ModelAsset& model, const ModelNode& node) {
 
     Entity nodeEntity = registry.createEntity();
 
@@ -34,11 +34,11 @@ Entity SceneManager::processSceneNode(Entity& parentEntity, const SceneAsset& sc
         parentNode.children.push_back(meshEntity);
     }
 
-    for (SceneNodeID childNodeID : node.children) {
+    for (ModelNodeID childNodeID : node.children) {
 
-        const SceneNode& childNode = scene.nodes[childNodeID];
+        const ModelNode& childNode = model.nodes[childNodeID];
 
-        Entity childEntity = processSceneNode(nodeEntity, scene, childNode);
+        Entity childEntity = processModelNode(nodeEntity, model, childNode);
         parentNode.children.push_back(childEntity);
     }
 
@@ -47,16 +47,16 @@ Entity SceneManager::processSceneNode(Entity& parentEntity, const SceneAsset& sc
     return nodeEntity;
 }
 
-Entity SceneManager::instantiate(SceneHandle sceneHandle) {
+Entity ModelSpawner::instantiate(ModelHandle modelHandle) {
 
     Entity root = registry.createEntity();
 
-    const SceneAsset& sceneAsset = resourceManager.getSceneAsset(sceneHandle);
+    const ModelAsset& modelAsset = resourceManager.getModelAsset(modelHandle);
 
-    Entity scene = processSceneNode(root, sceneAsset, sceneAsset.nodes[sceneAsset.root]);
+    Entity model = processModelNode(root, modelAsset, modelAsset.nodes[modelAsset.root]);
 
     Parent parent;
-    parent.children.push_back(scene);
+    parent.children.push_back(model);
     registry.insertComponents(root, parent, Transform(), WorldTransform());
 
     return root;
