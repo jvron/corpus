@@ -8,11 +8,26 @@
 
 void ImGuiLayer::init(World& world) {
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
+    IMGUI_CHECKVERSION();
 
-    ImGui_ImplGlfw_InitForOpenGL(world.engineState.windowState.handle, false);
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(world.engineState.windowState.handle, true);
     ImGui_ImplOpenGL3_Init("#version 450");
+
+    ImGui::StyleColorsDark();
+}
+
+void ImGuiLayer::beginFrame() {
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
+void ImGuiLayer::render() {
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ImGuiLayer::shutdown() {
