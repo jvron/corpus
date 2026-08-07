@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <span>
 #include <sys/types.h>
 #include <vector>
 
@@ -15,6 +17,9 @@ public:
     Entity createEntity();
     bool isValidEntity(Entity entity);
     void destroyEntity(Entity entity);
+
+    std::span<const Entity> entities() const;
+    size_t entityCount() const;
 
     template<typename T> //unique type id for each component type, a new function is created for each component type
     static uint32_t getId() {
@@ -116,8 +121,12 @@ public:
 private:
     static inline int typeCounter = 0;
     std::vector<SparseSet> pools;
-
-    //index = EntityID
+    
+    // [EntityID] = generation
     std::vector<uint32_t> generations;
     std::vector<EntityID> freeEntityIDs; 
+
+    // [EntityID] = activeEntities index
+    std::vector<size_t> entityLocations; 
+    std::vector<Entity> activeEntities;
 };
