@@ -2,6 +2,7 @@
 
 #include "engine/engine.hpp"
 #include "ecs/components.hpp"
+#include "ecs/registry.hpp"
 #include "engine/systems.hpp"
 #include "platform/clock.hpp"
 #include "platform/input.hpp"
@@ -12,20 +13,23 @@
 #include "resources/resource_manager.hpp"
 
 void Engine::registerComponents(World& world) {
+
+    Registry& registry = world.registry;
     
-    world.registry.registerComponent<Mesh>();
-    world.registry.registerComponent<Material>();
-    world.registry.registerComponent<Color>();
-    world.registry.registerComponent<Renderable>();
-    world.registry.registerComponent<Transform>();
-    world.registry.registerComponent<Camera>();
-    world.registry.registerComponent<CameraController>();
-    world.registry.registerComponent<PointLight>();
-    world.registry.registerComponent<DirectionalLight>();
-    world.registry.registerComponent<Spotlight>();
-    world.registry.registerComponent<Parent>();
-    world.registry.registerComponent<Child>();
-    world.registry.registerComponent<WorldTransform>();
+    registry.registerComponent<Mesh>();
+    registry.registerComponent<Material>();
+    registry.registerComponent<Color>();
+    registry.registerComponent<Renderable>();
+    registry.registerComponent<Transform>();
+    registry.registerComponent<Camera>();
+    registry.registerComponent<CameraController>();
+    registry.registerComponent<PointLight>();
+    registry.registerComponent<DirectionalLight>();
+    registry.registerComponent<Spotlight>();
+    registry.registerComponent<Parent>();
+    registry.registerComponent<Child>();
+    registry.registerComponent<WorldTransform>();
+    registry.registerComponent<Name>();
 }
 
 void Engine::startUp(World &world) {
