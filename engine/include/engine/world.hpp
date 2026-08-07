@@ -9,10 +9,11 @@ constexpr int32_t keyCount = 348;
 
 struct GLFWwindow;
 
-struct WindowConfig { // user defined
+struct WindowConfig {
     int width {};
     int height {};
     std::string title;
+    bool enableVSync {true};
 };
 
 struct WindowState {

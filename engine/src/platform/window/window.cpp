@@ -30,7 +30,14 @@ void Window::create(World& world) {
     glfwMakeContextCurrent(handle); // assign the window's openGL context to the TLS of the current thread
 
     glfwSetWindowUserPointer(handle, &world); // store world pointer in the window
-
+    
+    if (config.enableVSync) {
+        glfwSwapInterval(1);
+    }
+    else {
+        glfwSwapInterval(0);
+    }
+    
     windowState.handle = handle;
     windowState.aspect = (float) world.engineConfig.windowConfig.width /  world.engineConfig.windowConfig.height;
 }
