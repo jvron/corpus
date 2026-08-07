@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/string_pool.hpp"
 #include "ecs/components.hpp"
 #include "resources/resource_manager.hpp"
 #include "ecs/registry.hpp"
@@ -82,7 +83,9 @@ struct World {
     ResourceManager resourceManager;
     ModelSpawner modelSpawner;
 
-    Entity activeCamera;
+    StringPool stringPool;
 
+    Entity activeCamera;
+    
     World() : modelSpawner(registry, resourceManager) {}
 };
