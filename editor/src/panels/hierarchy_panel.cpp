@@ -56,7 +56,7 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
                 EditorActions::deleteEntity(world, entity);
 
                 if (state.isSelected(entity)) {
-                    state.selectedEntity = std::nullopt;
+                    state.clearSelection();
                 }
             }
             ImGui::EndPopup();

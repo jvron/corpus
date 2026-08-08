@@ -40,6 +40,10 @@ void EditorState::updateNameBuffer(World& world)  {
     nameBuffer[length] = '\0';
 }
 
+void EditorState::clearSelection() {
+    selectedEntity = std::nullopt;
+}
+
 bool EditorState::isSelected(Entity entity) const {
 
     if (!selectedEntity.has_value()) {

@@ -12,6 +12,7 @@ struct EditorState {
     std::array<char, MaxNameLength> nameBuffer {};
 
     void selectEntity(Entity entity);
+    void clearSelection();
     void updateNameBuffer(World& world);
     bool isSelected(Entity entity) const;
 };
