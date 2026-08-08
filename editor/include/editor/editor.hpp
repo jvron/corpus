@@ -5,7 +5,10 @@
 #include "engine/engine.hpp"
 
 struct EditorState {
-    Entity selectedEntity;
+
+    std::optional<Entity> selectedEntity;
+
+    bool isSelected(Entity entity) const;
 };
 
 class Editor {
@@ -17,4 +20,6 @@ public:
 
 private:
     EditorState state;
+
+    void draw(World& world);
 };
