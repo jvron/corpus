@@ -15,6 +15,8 @@ using EntityID = uint32_t;
 struct Entity {
     EntityID id {};
     uint32_t generation {};
+
+    constexpr bool operator==(const Entity& other) const = default; 
 };
 
 struct Name {
