@@ -7,3 +7,8 @@ namespace HierarchyPanel {
 
     void draw(World& world, EditorState& state);
 }
+
+namespace InspectorPanel {
+
+    void draw(World& world, EditorState& state);
+}
