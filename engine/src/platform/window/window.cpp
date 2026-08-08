@@ -5,6 +5,24 @@
 #include "platform/window.hpp"
 #include "engine/world.hpp"
 
+static void frameBufferCallback([[maybe_unused]] GLFWwindow* window, int width, int height) {
+
+    glViewport(0, 0, width, height);
+
+    World* worldHandle = static_cast<World*>(glfwGetWindowUserPointer(window));
+
+    if (!worldHandle) {
+        return;
+    }
+
+    WindowState& state = worldHandle->engineState.windowState;
+    state.aspect = (float) width / height;
+
+    WindowConfig& config = worldHandle->engineConfig.windowConfig;
+    config.width = width;
+    config.height = height;
+}
+
 void Window::create(World& world) {
 
     const WindowConfig& config = world.engineConfig.windowConfig;
@@ -19,6 +37,7 @@ void Window::create(World& world) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     GLFWwindow* handle = glfwCreateWindow(config.width, config.height, config.title.c_str(), nullptr,  nullptr);
     if (!handle) {
@@ -30,6 +49,8 @@ void Window::create(World& world) {
     glfwMakeContextCurrent(handle); // assign the window's openGL context to the TLS of the current thread
 
     glfwSetWindowUserPointer(handle, &world); // store world pointer in the window
+
+    glfwSetFramebufferSizeCallback(handle, frameBufferCallback);
     
     if (config.enableVSync) {
         glfwSwapInterval(1);
