@@ -1,5 +1,9 @@
+#include <cstddef>
+#include <cstring>
 #include <imgui.h>
+#include <string_view>
 
+#include "core/string_pool.hpp"
 #include "ecs/components.hpp"
 #include "engine/engine.hpp"
 #include "engine/world.hpp"
@@ -8,6 +12,33 @@
 #include "editor/editor.hpp"
 #include "editor/imgui_layer.hpp"
 #include "editor/panels.hpp"
+
+void EditorState::selectEntity(Entity entity)  {
+    selectedEntity = entity;
+}
+
+void EditorState::updateNameBuffer(World& world)  {
+
+    if (!selectedEntity.has_value()) {
+        return;
+    }
+
+    Entity entity = *selectedEntity;
+
+    if (!world.registry.hasComponent<Name>(entity)) {
+        return;
+    }
+
+    Name& name = world.registry.getComponent<Name>(entity);
+
+    std::string_view nameStr = world.stringPool.getString(name.id);
+
+    size_t length = std::min(nameStr.length(), nameBuffer.size() - 1);
+
+    std::memcpy(nameBuffer.data(), nameStr.data(), length);
+
+    nameBuffer[length] = '\0';
+}
 
 bool EditorState::isSelected(Entity entity) const {
 

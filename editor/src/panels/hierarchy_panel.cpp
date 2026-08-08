@@ -29,7 +29,8 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
 
         if (ImGui::Selectable(name.c_str(), selected)) {
 
-            state.selectedEntity = entity;
+            state.selectEntity(entity);
+            state.updateNameBuffer(world);
         }  
     }
 
