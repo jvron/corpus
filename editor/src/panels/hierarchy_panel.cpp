@@ -1,9 +1,11 @@
 #include <imgui.h>
+#include <optional>
 #include <string>
 
 #include "core/string_pool.hpp"
 #include "ecs/components.hpp"
 #include "editor/editor.hpp"
+#include "editor/editor_actions.hpp"
 #include "engine/world.hpp"
 
 #include "editor/panels.hpp"
@@ -11,6 +13,14 @@
 void HierarchyPanel::draw(World& world, EditorState& state) {
 
     ImGui::Begin("Hierarchy");
+
+    if (ImGui::Button("Add")) {
+
+        Entity newEntity = EditorActions::createEntity(world, "New Entity");
+
+        state.selectEntity(newEntity);
+        state.updateNameBuffer(world);
+    }
 
     for (Entity entity : world.registry.entities()) {
 
@@ -37,7 +47,20 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
 
             state.selectEntity(entity);
             state.updateNameBuffer(world);
-        }  
+        }
+        
+        if (ImGui::BeginPopupContextItem()) {
+
+            if (ImGui::MenuItem("Delete")) {
+
+                EditorActions::deleteEntity(world, entity);
+
+                if (state.isSelected(entity)) {
+                    state.selectedEntity = std::nullopt;
+                }
+            }
+            ImGui::EndPopup();
+        }
     }
 
     ImGui::End();
