@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.20)
 
 add_executable(corpus
     src/main.cpp
+    src/editor.cpp
+    src/imgui_layer.cpp
+    src/editor_actions.cpp
+    src/panels/hierarchy_panel.cpp
+    src/panels/inspector_panel.cpp
 )
-
-# -------------------------
-# Dear ImGui
-# -------------------------
 
 add_library(ImGui STATIC
     third_party/imgui/imgui.cpp
@@ -28,9 +29,7 @@ target_include_directories(ImGui PUBLIC
 
 target_link_libraries(ImGui PUBLIC glfw)
 
-# -------------------------
 # Editor dependencies
-# -------------------------
 
 target_link_libraries(corpus PRIVATE
     engine
@@ -39,12 +38,7 @@ target_link_libraries(corpus PRIVATE
 )
 
 target_include_directories(corpus PRIVATE
-    src
+    include
 )
-
-
-# -------------------------
-# C++ standard
-# -------------------------
 
 target_compile_features(corpus PRIVATE cxx_std_20)
