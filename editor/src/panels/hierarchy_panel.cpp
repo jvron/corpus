@@ -14,24 +14,26 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
 
     for (Entity entity : world.registry.entities()) {
 
-        std::string name;
+        std::string label;
 
         if (world.registry.hasComponent<Name>(entity)) {
 
             StringID id = world.registry.getComponent<Name>(entity).id;
-            name = world.stringPool.getString(id);
+            label = world.stringPool.getString(id);
 
-            if (name.empty()) {
-                name = "<Unnamed>";
+            if (label.empty()) {
+                label = "<Unnamed>";
             }
         }
         else {
-            name = "Entity_" + std::to_string(entity.id);
+            label = "Entity_" + std::to_string(entity.id);
         }
+
+        label = label + "##" + std::to_string(entity.id);
 
         bool selected = state.isSelected(entity);
 
-        if (ImGui::Selectable(name.c_str(), selected)) {
+        if (ImGui::Selectable(label.c_str(), selected)) {
 
             state.selectEntity(entity);
             state.updateNameBuffer(world);
