@@ -20,6 +20,10 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
 
             StringID id = world.registry.getComponent<Name>(entity).id;
             name = world.stringPool.getString(id);
+
+            if (name.empty()) {
+                name = "<Unnamed>";
+            }
         }
         else {
             name = "Entity_" + std::to_string(entity.id);
