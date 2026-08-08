@@ -1,40 +1,21 @@
 # Corpus
 
-A performance-focused 3D ECS game engine written in C++.
+A 3D ECS game engine written in C++ using OpenGL, inspired by Bevy.
 
-## Features
+The engine is still in its early stages, and its architecture and APIs are expected to change significantly.
 
-- Sparse set ECS
-- ECS views
-- OpenGL renderer
-- Model loading with Assimp
-- Texture loading with stb_image
-- Material system
-- Directional, point, and spot lighting
-- Camera system
+## Building
 
-## Requirements
+Corpus uses CMake for its build system.
 
-- C++20
-- OpenGL
+```bash
+git clone https://github.com/jvron/corpus.git
+cd corpus
 
-## Dependencies
-
-- GLFW
-- GLAD
-- GLM
-- Assimp
-- stb_image
-
-## TODO
-
-- Editor 
-- Physics system
-- Animation system
-- Audio system
-- Scene system
-- Advanced rendering features
+cmake -B build
+cmake --build build
+```
 
 ## License
 
-Apache License 2.0
+Corpus is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
