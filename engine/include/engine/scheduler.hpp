@@ -5,29 +5,31 @@
 
 #include "engine/world.hpp"
 
-constexpr size_t StageCount = 5;
+constexpr size_t StageCount = 7;
 
-using systemFn = void (*)(World &world);
+using SystemFn = void (*)(World& world);
 
 // schedule is a group of systems to be run together
 struct Schedule {
-    std::vector<systemFn> systems {}; 
+    std::vector<SystemFn> systems {}; 
 };
 
 enum class Stage{
+    Startup,
     Begin,
     Input, 
     Update,
     Render,
-    End
+    End,
+    Shutdown
 };
 
 class Scheduler {
 
 public:
-    void init(World &world);
+    void init(World& world);
     void runStage(Stage stage);
-    void addSystem(Stage stage, systemFn sys);
+    void addSystem(Stage stage, SystemFn sys);
 
 private:
     World *worldHandle = nullptr;

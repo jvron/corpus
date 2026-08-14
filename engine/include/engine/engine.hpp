@@ -6,10 +6,10 @@
 class Engine {
 
 public:
-    void startUp(World &world);
+    void startup(World& world);
     void runFrame(World& world);
-    void run(World &world);
-    void shutDown(World &world);
+    void run(World& world);
+    void shutdown(World& world);
 
     Scheduler scheduler;
 

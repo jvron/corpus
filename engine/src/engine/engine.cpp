@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "engine/engine.hpp"
 #include "ecs/components.hpp"
 #include "ecs/registry.hpp"
@@ -32,7 +30,7 @@ void Engine::registerComponents(World& world) {
     registry.registerComponent<Name>();
 }
 
-void Engine::startUp(World &world) {
+void Engine::startup(World& world) {
 
     Window::create(world);
     Renderer::init(world);
@@ -67,15 +65,19 @@ void Engine::runFrame(World& world) {
     scheduler.runStage(Stage::End);
 };
 
-void Engine::run(World &world) {
+void Engine::run(World& world) {
+
+    scheduler.runStage(Stage::Startup);
 
     while (!Window::shouldClose(world)) {
         
         runFrame(world);
     }
+
+    scheduler.runStage(Stage::Shutdown);
 }
 
-void Engine::shutDown(World& world) {
+void Engine::shutdown(World& world) {
 
     world.resourceManager.destroy();
     Window::destroy(world);
