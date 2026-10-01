@@ -1,9 +1,10 @@
 #pragma once
 
-#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+#include <cstdint>
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
@@ -78,7 +79,7 @@ struct MeshImport {
 struct ImageData {
     int width {};
     int height {};
-    void* data = nullptr;
+    void* data {};
     TexFormat format {};
 };
 

@@ -1,4 +1,3 @@
-#include "assimp/matrix4x4.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -6,9 +5,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/material.h>
-
 #include <assimp/vector3.h>
+#include <assimp/matrix4x4.h>
 #include <glm/geometric.hpp>
+
 #include <filesystem>
 #include <string>
 #include <iostream>
@@ -18,13 +18,13 @@
 
 #include "resources/asset_loader.hpp"
 
-std::string AssetLoader::readFile(const std::string &filePath) {
+std::string AssetLoader::readFile(const std::string& filePath) {
 
     std::ifstream file;
     file.open(filePath);
 
     if (!file) {
-        std::cerr << "[ERROR]: File not found at "<< filePath <<"\n";
+        std::cerr << "[ERROR]: File not found at " << filePath << "\n";
         return "";
     }
 
@@ -43,27 +43,20 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(filePath.c_str(), &imageData.width, &imageData.height, &channels, 0);
 
-    if (data == nullptr) {
+    if (!data) {
         std::cerr << "[ERROR](stb_image): Failed to load texture: " << filePath << "\n";
     }
 
     imageData.data = data;
 
     switch (channels) {
-        case 1:
-            imageData.format = TexFormat::Red;
-            break;
-        case 2:
-            imageData.format = TexFormat::Rg;
-            break;
-        case 3:
-            imageData.format = TexFormat::Rgb; 
-            break;
-        case 4:
-            imageData.format = TexFormat::Rgba;
-            break;
+        case 1: imageData.format = TexFormat::Red; break;
+        case 2: imageData.format = TexFormat::Rg; break;
+        case 3: imageData.format = TexFormat::Rgb; break;
+        case 4: imageData.format = TexFormat::Rgba; break;
         default:
-            std::cerr << "[ERROR](stb_image): Unsupported number of channels: " << channels <<", for texture: " << filePath << "\n";
+            std::cerr << "[ERROR](stb_image): Unsupported number of channels: " 
+                << channels << ", for texture: " << filePath << "\n";
             break;
     }  
 
@@ -72,16 +65,18 @@ ImageData AssetLoader::loadImage(const std::string& filePath) {
 
 void AssetLoader::freeImage(ImageData& imageData) {
 
-    if (imageData.data) {
-
-        stbi_image_free(imageData.data);
-        imageData.data = nullptr;
+    if (!imageData.data) {
+        return;
     }
+
+    stbi_image_free(imageData.data);
+    imageData.data = nullptr;
+    
 }
 
 static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, bool hasNormal, bool hasTangent) {
 
-    VertexAttribute position = {
+    VertexAttribute position {
         .location = AttributeLocation::Position,
         .componentCount = 3,
         .type = ComponentType::Float,
@@ -92,7 +87,7 @@ static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, b
     layout.attributes.push_back(position);
 
     if (hasColor) {
-        VertexAttribute color = {
+        VertexAttribute color {
             .location = AttributeLocation::Color,
             .componentCount = 4,
             .type = ComponentType::Float,
@@ -102,9 +97,8 @@ static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, b
 
         layout.attributes.push_back(color);
     }
-
     if (hasUv) {
-        VertexAttribute uv = {
+        VertexAttribute uv {
             .location = AttributeLocation::Uv,
             .componentCount = 2,
             .type = ComponentType::Float,
@@ -114,9 +108,8 @@ static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, b
 
         layout.attributes.push_back(uv);
     }
-
     if (hasNormal) {
-        VertexAttribute normal = {
+        VertexAttribute normal {
             .location = AttributeLocation::Normal,
             .componentCount = 3,
             .type = ComponentType::Float,
@@ -126,9 +119,8 @@ static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, b
 
         layout.attributes.push_back(normal);
     }
-
     if (hasTangent) {
-        VertexAttribute tangent = {
+        VertexAttribute tangent {
             .location = AttributeLocation::Tangent,
             .componentCount = 4,
             .type = ComponentType::Float,
@@ -141,13 +133,13 @@ static void buildVertexLayout(VertexLayout& layout, bool hasColor, bool hasUv, b
 }
 
 static MeshData processMesh(const aiMesh& mesh) {
-    MeshData meshData;
 
     bool hasColor = mesh.HasVertexColors(0);
     bool hasUv = mesh.HasTextureCoords(0);
     bool hasNormal = mesh.HasNormals();
     bool hasTangent = mesh.HasTangentsAndBitangents() && hasNormal;
 
+    MeshData meshData;
     meshData.vertices.reserve(mesh.mNumVertices);
 
     for (size_t i = 0; i < mesh.mNumVertices; i++) {
@@ -168,8 +160,7 @@ static MeshData processMesh(const aiMesh& mesh) {
                 color.b,
                 color.a
             };
-        }
-        else {
+        } else {
             vertex.color = {1.0f, 1.0f, 1.0f, 1.0f};
         }
 
@@ -179,8 +170,7 @@ static MeshData processMesh(const aiMesh& mesh) {
                 texCoords.x,
                 texCoords.y
             };
-        }
-        else {
+        } else {
             vertex.uv = {0.0f, 0.0f};
         }
 
@@ -191,8 +181,7 @@ static MeshData processMesh(const aiMesh& mesh) {
                 norm.y,
                 norm.z
             };
-        }
-        else {
+        } else {
             vertex.normal = {0.0f, 0.0f, 0.0f};
         }
 
@@ -201,9 +190,9 @@ static MeshData processMesh(const aiMesh& mesh) {
             const aiVector3D& B = mesh.mBitangents[i];
             const aiVector3D& N = mesh.mNormals[i];
 
-            glm::vec3 tangent = {T.x, T.y, T.z};
-            glm::vec3 biTangent = {B.x, B.y, B.z};
-            glm::vec3 normal = {N.x, N.y, N.z};
+            glm::vec3 tangent {T.x, T.y, T.z};
+            glm::vec3 biTangent {B.x, B.y, B.z};
+            glm::vec3 normal {N.x, N.y, N.z};
 
             float w = glm::dot(glm::cross(normal, tangent), biTangent) < 0.0f ? -1.0f : 1.0f;
 
@@ -213,8 +202,7 @@ static MeshData processMesh(const aiMesh& mesh) {
                 tangent.z,
                 w
             };
-        }
-        else {
+        } else {
             vertex.tangent = {0.0f, 0.0f, 0.0f, 1.0f};
         }
 
@@ -222,6 +210,7 @@ static MeshData processMesh(const aiMesh& mesh) {
     }
 
     meshData.indices.reserve(mesh.mNumFaces * 3);
+
     for (unsigned int i = 0; i < mesh.mNumFaces; i++) {
         const aiFace& face = mesh.mFaces[i];
 
@@ -243,11 +232,10 @@ static MeshData processMesh(const aiMesh& mesh) {
 static void processTexture(const aiMaterial& material, MaterialImport& materialImport, const std::filesystem::path& modelDir, aiTextureType aiTexType, TexType texType) {
 
     size_t textureCount = material.GetTextureCount(aiTexType);
-
     materialImport.textureImports.reserve(materialImport.textureImports.size() + textureCount);
 
     for (size_t i = 0; i < textureCount; i++) {
-        
+
         aiString path;
         material.GetTexture(aiTexType, i, &path);
 
@@ -269,10 +257,10 @@ static void processMaterials(const aiScene& scene, ModelImport& modelImport, con
         MaterialImport materialImport;
 
         std::string name = material->GetName().C_Str();
+
         if (name.empty()) {
             materialImport.name = "Material_" + std::to_string(i);
-        }
-        else {
+        } else {
             materialImport.name = std::move(name);
         }
 
@@ -323,7 +311,6 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
         if (name.empty()) {
             name = "Mesh_" + std::to_string(nodeImport.meshImports.size());
         }
-        
 
         MeshImport meshImport {
             .name = std::move(name),
@@ -335,9 +322,7 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
 
     //process child nodes
     for (size_t i = 0; i < node.mNumChildren; i++) {
-
         NodeImport childNode = processNode(*node.mChildren[i], scene);
-
         nodeImport.children.push_back(std::make_unique<NodeImport>(std::move(childNode)));
     }
 
@@ -346,15 +331,18 @@ static NodeImport processNode(const aiNode& node, const aiScene& scene) {
 
 ModelImport AssetLoader::loadModel(const std::string& filePath) {
 
-    constexpr unsigned int importFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs;
+    constexpr uint32_t importFlags = 
+        aiProcess_Triangulate | 
+        aiProcess_GenNormals | 
+        aiProcess_CalcTangentSpace | 
+        aiProcess_FlipUVs;
 
     ModelImport modelImport;
-
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(filePath, importFlags);
 
-    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cerr << "[ERROR](Assimp): " << importer.GetErrorString() << "\n";
         return modelImport;
     }
@@ -365,7 +353,6 @@ ModelImport AssetLoader::loadModel(const std::string& filePath) {
     std::filesystem::path modelDir = path.parent_path();
 
     processMaterials(*scene, modelImport, modelDir);
-
     modelImport.root = processNode(*scene->mRootNode, *scene);
 
     return modelImport;

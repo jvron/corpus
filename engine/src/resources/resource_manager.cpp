@@ -17,7 +17,6 @@ void ResourceManager::init() {
 
     auto createTexture = [](const ImageData& imageData) {
         Texture texture;
-
         GLBackend::createTexture2D(texture.id);
         GLBackend::allocateTexture2D(texture.id, imageData.format, imageData.width, imageData.height);
         GLBackend::uploadTexture2D(texture.id, imageData.format, imageData.width, imageData.height, imageData.data);
@@ -121,9 +120,7 @@ ShaderHandle ResourceManager::createShaderProgram(const std::vector<std::string>
 }
 
 ShaderProgram ResourceManager::getShaderProgram(ShaderHandle shaderHandle) {
-
     assert(!(shaderHandle >= shaderPrograms.size()) && "[ERROR]: Shader program does not exist");
-
     return shaderPrograms[shaderHandle];
 }
 
@@ -161,16 +158,13 @@ TextureHandle ResourceManager::loadTexture(const std::string& filePath) {
     ImageData imageData = AssetLoader::loadImage(filePath);
 
     TextureHandle handle = createTexture(imageData);
-    
     AssetLoader::freeImage(imageData);
 
     return handle;
 }
 
 Texture& ResourceManager::getTexture(TextureHandle textureHandle) {
-    
     assert(!(textureHandle >= textures.size()) && "Error: Texture does not exist");
-
     return textures[textureHandle]; 
 }
 
@@ -188,7 +182,6 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
     };
 
     if (parameters.enableMipmap) {
-
         GLBackend::generateMipmap(texture.id);
 
         if (!isMipmapFilter(parameters.minFilter)) {
@@ -196,8 +189,7 @@ void ResourceManager::setTex2DParameters(TextureHandle textureHandle, const Tex2
             return;
         }
         GLBackend::setTexture2DFilter(texture.id, parameters.minFilter, parameters.magFilter);
-    }
-    else {
+    } else {
 
         if (isMipmapFilter(parameters.minFilter)) {
             std::cerr << "[ERROR]: Mipmap filter provided but mipmaps are disabled \n"; 
@@ -219,14 +211,11 @@ Material ResourceManager::loadMaterial(const MaterialAsset& materialAsset) {
 }
 
 MaterialAsset& ResourceManager::getMaterialAsset(MaterialHandle materialHandle) {
-    
     assert(materialHandle < materialAssets.size() && "[ERROR]: MaterialAsset does not exist");
-
     return materialAssets[materialHandle];
 }
 
 MeshAsset& ResourceManager::getMeshAsset(MeshHandle meshHandle) {
-
     assert(!(meshHandle >= meshAssets.size()) && "[ERROR]: MeshAsset does not exist");
     return meshAssets[meshHandle];
 }   
@@ -269,7 +258,7 @@ Mesh ResourceManager::loadMesh(const MeshData& meshData, const std::string& mesh
         meshAsset.meshData = std::move(meshData);
     }
 
-    const MeshHandle meshHandle = meshAssets.size();
+    MeshHandle meshHandle = meshAssets.size();
     meshAssets.push_back(meshAsset);
 
     Mesh mesh {
@@ -299,7 +288,6 @@ ModelNodeID ResourceManager::processNodeImport(ModelAsset& model, const NodeImpo
     }
 
     for (size_t i = 0; i < node.children.size(); i++) {
-
         ModelNodeID childID = processNodeImport(model, *node.children[i], materialHandles, storeMeshData);
         model.nodes[nodeID].children.push_back(childID);
     }
@@ -351,7 +339,6 @@ ModelHandle ResourceManager::loadModel(const std::string& filePath, const ModelI
         }
 
         Material material = loadMaterial(materialAsset);
-
         materialHandles.push_back(material.handle);
     }
 
@@ -366,9 +353,7 @@ ModelHandle ResourceManager::loadModel(const std::string& filePath, const ModelI
 }
 
 ModelAsset& ResourceManager::getModelAsset(ModelHandle modelHandle) {
-
     assert(modelHandle < modelAssets.size() && "[ERROR]: modelAsset does not exist");
-
     return modelAssets[modelHandle];
 }
 

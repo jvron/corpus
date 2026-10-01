@@ -1,10 +1,10 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "ecs/components.hpp"
-#include "ecs/registry.hpp"
 #include "engine/systems.hpp"
 #include "engine/world.hpp"
+#include "ecs/components.hpp"
+#include "ecs/registry.hpp"
 #include "ecs/view.hpp"
 
 glm::mat4 TransformSystem::getLocalMatrix(const Transform& transform) {
@@ -53,7 +53,6 @@ void TransformSystem::update(World& world) {
         
         // update only root entities 
         if (!registry.hasComponent<Child>(entity)) {
-
             updateWorldMatrix(entity, identity, registry);
         }
     }
