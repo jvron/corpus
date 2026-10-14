@@ -1,7 +1,4 @@
 #include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <string_view>
 
 #include "core/string_pool.hpp"
 
@@ -15,9 +12,7 @@ StringID StringPool::intern(std::string_view string) {
 
     size_t index = strings.size();
 
-    StringID id {
-        .value = static_cast<uint32_t>(index) 
-    };
+    StringID id = static_cast<uint32_t>(index);
 
     strings.emplace_back(string);
 
@@ -28,9 +23,9 @@ StringID StringPool::intern(std::string_view string) {
 
 std::string_view StringPool::getString(StringID id) const {
 
-    assert(id.value < strings.size() && "ERROR: Invalid StringID provided");
+    assert(id < strings.size() && "ERROR: Invalid StringID provided");
 
-    return strings[id.value];
+    return strings[id];
 }
 
 size_t StringPool::size() const {

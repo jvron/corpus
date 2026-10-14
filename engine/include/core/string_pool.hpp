@@ -1,14 +1,12 @@
 #pragma once
 
-#include <cstdint>
 #include <string>
+#include <vector>
+#include <cstdint>
 #include <string_view>
 #include <unordered_map>
-#include <vector>
 
-struct StringID {
-    uint32_t value {};
-};
+using StringID = uint32_t;
 
 class StringPool {
 
