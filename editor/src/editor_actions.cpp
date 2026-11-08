@@ -12,12 +12,11 @@ Entity EditorActions::createEntity(World& world, std::string_view name) {
 
     StringID nameId = world.stringPool.intern(name);
 
-    world.registry.insert(entity, Name {nameId});
+    world.registry.insert(entity, Name{nameId});
 
     return entity;
 }
 
 void EditorActions::deleteEntity(World& world, Entity entity) {
-
     world.registry.destroyEntity(entity);
 }

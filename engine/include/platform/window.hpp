@@ -3,7 +3,6 @@
 struct World;
 
 namespace Window {
-
     void create(World &world);
 
     void pollEvents(World &world);

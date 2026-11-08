@@ -1,10 +1,12 @@
 #pragma once 
  
-#include "core/string_pool.hpp"
+#include <cstdint>
+
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include <cstdint>
+
+#include "core/string_pool.hpp"
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;
@@ -20,7 +22,7 @@ struct Entity {
 };
 
 struct Name {
-    StringID id;
+    StringID id {};
 };
 
 struct Parent {
@@ -51,7 +53,7 @@ struct Mesh {
 };
 
 struct Material {
-    MaterialHandle handle;
+    MaterialHandle handle {};
 };
 
 struct Renderable {

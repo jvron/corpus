@@ -3,7 +3,6 @@
 struct World;
 
 namespace Clock {
-
     double getRawTime();
     double getFrameTime(World& world);
 

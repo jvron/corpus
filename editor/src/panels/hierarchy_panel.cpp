@@ -1,6 +1,6 @@
-#include <imgui.h>
-#include <optional>
 #include <string>
+
+#include <imgui.h>
 
 #include "core/string_pool.hpp"
 #include "ecs/components.hpp"
@@ -44,7 +44,6 @@ void HierarchyPanel::draw(World& world, EditorState& state) {
         bool selected = state.isSelected(entity);
 
         if (ImGui::Selectable(label.c_str(), selected)) {
-
             state.selectEntity(entity);
             state.updateNameBuffer(world);
         }
