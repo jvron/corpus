@@ -1,6 +1,6 @@
-#include "ecs/components.hpp"
-#include "scene/model_spawner.hpp"
-#include "resources/resource_manager.hpp"
+#include "corpus/components.hpp"
+#include "corpus/model_spawner.hpp"
+#include "corpus/resource_manager.hpp"
 
 Entity ModelSpawner::processModelNode(Entity& parentEntity, const ModelAsset& model, const ModelNode& node) {
 

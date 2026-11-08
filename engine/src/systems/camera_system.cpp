@@ -3,8 +3,8 @@
 #include <glm/trigonometric.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
-#include "ecs/components.hpp"
-#include "engine/systems.hpp"
+#include "corpus/components.hpp"
+#include "corpus/systems.hpp"
 
 void CameraSystem::updateView(Camera& camera, glm::mat4& view) {
 

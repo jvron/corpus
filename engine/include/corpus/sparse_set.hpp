@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "ecs/components.hpp"
+#include "components.hpp"
 
 constexpr int maxEntities = 1024;
 //constexpr size_t pageSize = 1024;

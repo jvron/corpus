@@ -1,9 +1,10 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "platform/window.hpp"
-#include "engine/world.hpp"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "corpus/window.hpp"
+#include "corpus/world.hpp"
 
 static void frameBufferCallback([[maybe_unused]] GLFWwindow* window, int width, int height) {
 

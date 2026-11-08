@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "engine/world.hpp"
-#include "engine/scheduler.hpp"
+#include "world.hpp"
+#include "scheduler.hpp"
 
 class Engine {
 

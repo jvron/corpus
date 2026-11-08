@@ -1,16 +1,19 @@
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <glm/ext/matrix_transform.hpp>
+
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "engine/systems.hpp"
-#include "resources/resource_manager.hpp"
-#include "ecs/components.hpp"
-#include "engine/world.hpp"
-#include "ecs/view.hpp"
-#include "renderer/renderer.hpp"
+#include "corpus/view.hpp"
+#include "corpus/world.hpp"
+#include "corpus/systems.hpp"
+#include "corpus/renderer.hpp"
+#include "corpus/components.hpp"
+#include "corpus/resource_manager.hpp"
+
 #include "opengl/gl_backend.hpp"
 
 void Renderer::init(World &world) {

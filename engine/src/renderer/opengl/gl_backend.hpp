@@ -1,15 +1,16 @@
 #pragma once
 
 #include <cstdint>
-#include <glad/glad.h>
 #include <cstddef>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
 #include <string>
 
-#include "ecs/components.hpp"
-#include "resources/asset_loader.hpp"
-#include "resources/resource_manager.hpp"
+#include <glad/glad.h>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+
+#include "corpus/components.hpp"
+#include "corpus/asset_loader.hpp"
+#include "corpus/resource_manager.hpp"
 
 struct GPUMesh;
 

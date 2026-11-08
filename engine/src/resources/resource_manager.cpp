@@ -7,11 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "resources/resource_manager.hpp"
-#include "ecs/components.hpp"
-#include "renderer/renderer.hpp"
-#include "renderer/opengl/gl_backend.hpp" 
-#include "resources/asset_loader.hpp"
+#include "corpus/components.hpp"
+#include "corpus/renderer.hpp"
+#include "corpus/asset_loader.hpp"
+#include "corpus/resource_manager.hpp"
+
+#include "renderer/opengl/gl_backend.hpp"
 
 void ResourceManager::init() {
 

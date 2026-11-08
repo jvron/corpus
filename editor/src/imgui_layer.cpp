@@ -3,8 +3,9 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
 
+#include "corpus/world.hpp"
+
 #include "editor/imgui_layer.hpp"
-#include "engine/world.hpp"
 
 void ImGuiLayer::init(World& world) {
 
@@ -34,5 +35,5 @@ void ImGuiLayer::shutdown() {
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext(); 
+    ImGui::DestroyContext();
 }

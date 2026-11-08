@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include "ecs/sparse_set.hpp"
-#include "ecs/components.hpp"
+#include "corpus/sparse_set.hpp"
+#include "corpus/components.hpp"
 
 size_t SparseSet::size() const {
     return denseEntities.size();

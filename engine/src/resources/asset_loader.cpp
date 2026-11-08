@@ -1,3 +1,10 @@
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <memory>
+#include <filesystem>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -9,14 +16,7 @@
 #include <assimp/matrix4x4.h>
 #include <glm/geometric.hpp>
 
-#include <filesystem>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <memory>
-
-#include "resources/asset_loader.hpp"
+#include "corpus/asset_loader.hpp"
 
 std::string AssetLoader::readFile(const std::string& filePath) {
 

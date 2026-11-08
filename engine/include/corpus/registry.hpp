@@ -8,8 +8,8 @@
 #include <sys/types.h>
 #include <vector>
 
-#include "ecs/components.hpp"
-#include "ecs/sparse_set.hpp"
+#include "components.hpp"
+#include "sparse_set.hpp"
 
 class Registry {
 

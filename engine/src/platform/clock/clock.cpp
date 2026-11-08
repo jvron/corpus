@@ -1,8 +1,9 @@
-#include <GLFW/glfw3.h>
 #include <string>
 
-#include "platform/clock.hpp"
-#include "engine/world.hpp"
+#include <GLFW/glfw3.h>
+
+#include "corpus/clock.hpp"
+#include "corpus/world.hpp"
 
 double Clock::getRawTime() {
     return glfwGetTime();

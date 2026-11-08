@@ -1,8 +1,9 @@
-#include <GLFW/glfw3.h>
 #include <cstring>
 
-#include "platform/input.hpp"
-#include "engine/world.hpp"
+#include <GLFW/glfw3.h>
+
+#include "corpus/input.hpp"
+#include "corpus/world.hpp"
 
 void Input::init(World& world) {
     

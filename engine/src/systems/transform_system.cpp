@@ -1,11 +1,11 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "engine/systems.hpp"
-#include "engine/world.hpp"
-#include "ecs/components.hpp"
-#include "ecs/registry.hpp"
-#include "ecs/view.hpp"
+#include "corpus/view.hpp"
+#include "corpus/world.hpp"
+#include "corpus/systems.hpp"
+#include "corpus/registry.hpp"
+#include "corpus/components.hpp"
 
 glm::mat4 TransformSystem::getLocalMatrix(const Transform& transform) {
 

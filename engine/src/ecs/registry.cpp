@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "ecs/registry.hpp"
-#include "ecs/components.hpp"
+#include "corpus/registry.hpp"
+#include "corpus/components.hpp"
 
 bool Registry::isValidEntity(Entity entity) {
 

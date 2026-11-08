@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/string_pool.hpp"
-#include "ecs/components.hpp"
-#include "resources/resource_manager.hpp"
-#include "ecs/registry.hpp"
-#include "scene/model_spawner.hpp"
+#include "registry.hpp"
+#include "string_pool.hpp"
+#include "components.hpp"
+#include "model_spawner.hpp"
+#include "resource_manager.hpp"
 
 constexpr int32_t keyCount = 348; 
 

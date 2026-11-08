@@ -1,7 +1,8 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
 #include <cstdint>
+
+#include <GLFW/glfw3.h>
 
 struct World;
 struct GLFWwindow; 

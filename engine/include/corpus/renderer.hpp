@@ -1,11 +1,12 @@
 #pragma once
 
 #include <cstdint>
+
 #include <glm/ext/matrix_float4x4.hpp>
 
-#include "ecs/components.hpp"
-#include "engine/world.hpp"
-#include "resources/resource_manager.hpp"
+#include "components.hpp"
+#include "world.hpp"
+#include "resource_manager.hpp"
 
 constexpr int MaxPointLights = 32;
 constexpr int MaxSpotlights = 12;

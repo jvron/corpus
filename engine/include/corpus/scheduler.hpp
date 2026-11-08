@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "engine/world.hpp"
+#include "world.hpp"
 
 constexpr size_t StageCount = 7;
 

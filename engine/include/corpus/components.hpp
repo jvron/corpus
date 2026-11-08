@@ -6,7 +6,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "core/string_pool.hpp"
+#include "string_pool.hpp"
 
 using MeshHandle = uint32_t;
 using ShaderHandle = uint32_t;

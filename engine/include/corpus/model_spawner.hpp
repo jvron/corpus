@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ecs/components.hpp"
-#include "ecs/registry.hpp"
-#include "resources/resource_manager.hpp"
+#include "components.hpp"
+#include "registry.hpp"
+#include "resource_manager.hpp"
 
 class ModelSpawner {
 

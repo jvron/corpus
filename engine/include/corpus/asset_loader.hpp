@@ -9,7 +9,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "ecs/components.hpp"
+#include "components.hpp"
 
 enum class TexFormat {
     Red,

@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "core/string_pool.hpp"
+#include "corpus/string_pool.hpp"
 
 StringID StringPool::intern(std::string_view string) {
 

@@ -1,9 +1,9 @@
 #include <glm/trigonometric.hpp>
 #include <glm/ext/vector_float3.hpp>
 
-#include "ecs/components.hpp"
-#include "engine/systems.hpp"
-#include "engine/world.hpp"
+#include "corpus/components.hpp"
+#include "corpus/systems.hpp"
+#include "corpus/world.hpp"
 
 void CameraControlSystem::update(World& world) {
 

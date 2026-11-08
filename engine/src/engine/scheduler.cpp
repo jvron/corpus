@@ -2,8 +2,8 @@
 #include <cstddef>
 #include <vector>
 
-#include "engine/scheduler.hpp"
-#include "engine/world.hpp"
+#include "corpus/scheduler.hpp"
+#include "corpus/world.hpp"
 
 void Scheduler::init(World& world) {
     worldHandle = &world;

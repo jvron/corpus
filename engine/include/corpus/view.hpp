@@ -5,8 +5,8 @@
 #include <tuple>
 #include <vector>
 
-#include "ecs/registry.hpp"
-#include "ecs/sparse_set.hpp"
+#include "registry.hpp"
+#include "sparse_set.hpp"
 
 template <typename ... Component>
 class View {

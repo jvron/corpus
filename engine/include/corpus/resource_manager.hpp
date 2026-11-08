@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "ecs/components.hpp"
+#include "components.hpp"
 #include "asset_loader.hpp"
 
 struct World;

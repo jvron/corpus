@@ -3,9 +3,9 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
 
-#include "ecs/components.hpp"
-#include "ecs/registry.hpp"
-#include "engine/world.hpp"
+#include "components.hpp"
+#include "registry.hpp"
+#include "world.hpp"
 
 namespace CameraControlSystem {
     static const glm::vec3 worldUp {0.0f, 1.0f, 0.0f};

@@ -6,8 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "gl_backend.hpp"
-#include "resources/asset_loader.hpp"
-#include "resources/resource_manager.hpp"
+#include "corpus/asset_loader.hpp"
+#include "corpus/resource_manager.hpp"
 
 void GLBackend::clearBuffer(Color& clearColor) {
     glClearColor(clearColor.value.r, clearColor.value.g, clearColor.value.b, clearColor.value.a);
